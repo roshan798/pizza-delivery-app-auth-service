@@ -11,5 +11,9 @@
   "description": "User authentication and management service for the application",
   "engines": {
     "node": ">=22.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "typescript": "^5.8.3"
   }
 }
