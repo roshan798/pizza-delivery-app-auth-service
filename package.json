@@ -1,0 +1,15 @@
+{
+  "name": "auth-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node ./server.js --watch",
+    "start": "node server.js"
+  },
+  "author": "Roshan Kumar",
+  "license": "ISC",
+  "description": "User authentication and management service for the application",
+  "engines": {
+    "node": ">=22.10.0"
+  }
+}
