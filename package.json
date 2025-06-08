@@ -25,14 +25,17 @@
 		"husky": "^9.1.7",
 		"lint-staged": "^16.1.0",
 		"prettier": "3.5.3",
+		"ts-node-dev": "^2.0.0",
 		"typescript": "^5.8.3",
-		"typescript-eslint": "^8.33.1",
-		"ts-node-dev": "^2.0.0"
+		"typescript-eslint": "^8.33.1"
 	},
 	"lint-staged": {
 		"*.ts": [
 			"npm run format:fix",
 			"npm run lint:fix"
 		]
+	},
+	"dependencies": {
+		"dotenv": "^16.5.0"
 	}
 }
