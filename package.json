@@ -1,19 +1,20 @@
 {
 	"name": "auth-service",
 	"version": "1.0.0",
-	"main": "index.js",
+	"description": "User authentication and management service for the application",
+	"main": "dist/server.js",
 	"scripts": {
-		"dev": "node server.js --watch",
-		"start": "node server.js",
+		"dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+		"start": "node dist/server.js",
+		"build": "tsc",
 		"format:fix": "prettier --write .",
 		"format:check": "prettier . --check",
 		"lint:check": "eslint .",
 		"lint:fix": "eslint . --fix",
-		"prepare": "husky"
+		"prepare": "husky install"
 	},
 	"author": "Roshan Kumar",
 	"license": "ISC",
-	"description": "User authentication and management service for the application",
 	"engines": {
 		"node": ">=22.10.0"
 	},
@@ -25,9 +26,13 @@
 		"lint-staged": "^16.1.0",
 		"prettier": "3.5.3",
 		"typescript": "^5.8.3",
-		"typescript-eslint": "^8.33.1"
+		"typescript-eslint": "^8.33.1",
+		"ts-node-dev": "^2.0.0"
 	},
 	"lint-staged": {
-		"*.ts": "npm run format:fix && npm run lint:fix"
+		"*.ts": [
+			"npm run format:fix",
+			"npm run lint:fix"
+		]
 	}
 }
