@@ -7,5 +7,6 @@ const HOST = process.env.HOST || 'localhost';
 export const Config = {
 	PORT,
 	HOST,
+	URL: `http://${HOST}:${PORT}`,
 	NODE_ENV: process.env.NODE_ENV,
 };
