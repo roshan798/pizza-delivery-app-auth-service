@@ -1,4 +1,5 @@
 const sayHello = (name: string) => {
-    console.log(`Hello, ${name}!`);
-}
-sayHello("World");
+    //console.error(`Hello, ${name}!`);
+    return `Hello, ${name}!`;
+};
+sayHello('World');
