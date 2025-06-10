@@ -44,9 +44,11 @@
 	"dependencies": {
 		"@types/express": "^5.0.3",
 		"@types/http-errors": "^2.0.5",
+		"@types/supertest": "^6.0.3",
 		"dotenv": "^16.5.0",
 		"express": "^5.1.0",
 		"http-errors": "^2.0.0",
+		"supertest": "^7.1.1",
 		"winston": "^3.17.0"
 	}
 }
