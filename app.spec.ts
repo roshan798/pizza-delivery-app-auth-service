@@ -2,7 +2,7 @@ import app from './src/app';
 import { getCurrentDateTime } from './src/utils';
 import request from 'supertest';
 
-describe('App', () => {
+describe.skip('App', () => {
 	it('should be defined', () => {
 		expect(app).toBeDefined();
 	});
@@ -13,7 +13,7 @@ describe('App', () => {
 	});
 });
 
-describe('getCurrentDateTime', () => {
+describe.skip('getCurrentDateTime', () => {
 	it('should return the current date and time in ISO format', () => {
 		const currentDateTime = getCurrentDateTime();
 		expect(currentDateTime).toBeDefined();

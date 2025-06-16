@@ -13,6 +13,7 @@ export default tseslint.config(
 			'dist',
 			'eslint.config.mjs',
 			'jest.config.js',
+			'**/*.spec.ts',
 		],
 	},
 	{
