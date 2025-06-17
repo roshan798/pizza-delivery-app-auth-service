@@ -1,12 +1,26 @@
 import { config } from 'dotenv';
-config();
+import path from 'node:path';
+config({ path: path.join(__dirname, `../../.env.${process.env.NODE_ENV}`) });
 
-const PORT = process.env.PORT || 8080; // Default to 8080 if PORT is not set
-const HOST = process.env.HOST || 'localhost';
-
+const {
+	PORT,
+	HOST,
+	DB_HOST,
+	DB_PORT,
+	DB_USERNAME,
+	DB_PASSWORD,
+	DB_NAME,
+	DB_LOGGING,
+} = process.env;
 export const Config = {
 	PORT,
 	HOST,
 	URL: `http://${HOST}:${PORT}`,
 	NODE_ENV: process.env.NODE_ENV,
+	DB_HOST,
+	DB_PORT,
+	DB_USERNAME,
+	DB_PASSWORD,
+	DB_NAME,
+	DB_LOGGING: DB_LOGGING === 'true' || DB_LOGGING === '1' ? true : false,
 };
