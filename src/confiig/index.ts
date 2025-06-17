@@ -12,6 +12,18 @@ const {
 	DB_NAME,
 	DB_LOGGING,
 } = process.env;
+
+console.log('Environment Variables:', {
+	PORT,
+	HOST,
+	DB_HOST,
+	DB_PORT,
+	DB_USERNAME,
+	DB_PASSWORD,
+	DB_NAME,
+	DB_LOGGING,
+});
+
 export const Config = {
 	PORT,
 	HOST,

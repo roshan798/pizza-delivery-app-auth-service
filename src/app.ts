@@ -8,7 +8,7 @@ const app = express();
 app.get('/', (req, res) => {
 	res.json({ message: 'Welcome to Auth-Service 👋' });
 });
-
+app.use(express.json());
 app.use('/auth', authRouter);
 
 // globlal error handler
