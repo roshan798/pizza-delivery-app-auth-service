@@ -13,6 +13,7 @@ const {
 	DB_LOGGING,
 } = process.env;
 
+// eslint-disable-next-line no-console
 console.log('Environment Variables:', {
 	PORT,
 	HOST,
