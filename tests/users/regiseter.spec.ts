@@ -63,6 +63,10 @@ describe('POST auth/register', () => {
 			const userRepo = connection.getRepository('User');
 			const users = await userRepo.find();
 			expect(users.length).toBe(1);
+			expect(users[0].firstName).toBe(user.firstName);
+			expect(users[0].lastName).toBe(user.lastName);
+			expect(users[0].email).toBe(user.email);
+			expect(users[0].password).toBe(user.password);
 		});
 	});
 
