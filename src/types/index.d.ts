@@ -8,3 +8,6 @@ export interface UserData {
 export interface RegisterUserRequest extends Request {
 	body: UserData;
 }
+export interface User extends Omit<UserData, 'password'> {
+	id: number;
+}

@@ -68,6 +68,20 @@ describe('POST auth/register', () => {
 			expect(users[0].email).toBe(user.email);
 			expect(users[0].password).toBe(user.password);
 		});
+
+		it('should return a valid userId in response', async () => {
+			const user = {
+				firstName: 'John',
+				lastName: 'Doe',
+				email: 'test@email.com',
+				password: 'password123',
+			};
+			const response = await request(app)
+				.post('/auth/register')
+				.send(user);
+			expect(response.body.userId).toBeDefined();
+			expect(typeof response.body.userId).toBe('number');
+		});
 	});
 
 	describe('Missing some or all fields', () => {});

@@ -9,19 +9,24 @@ export class AuthController {
 		logger.info('Register endpoint hit');
 		logger.info(`Request body: ${JSON.stringify(req.body)}`);
 		const { firstName, lastName, email, password } = req.body;
-		await this.userService.create({
+		const savedUser = await this.userService.create({
 			firstName,
 			lastName,
 			email,
 			password,
 		});
-
+		const responseData = {
+			userId: savedUser.id,
+			firstName: savedUser.firstName,
+			lastName: savedUser.lastName,
+			email: savedUser.email,
+		};
 		logger.info(
-			`Received registration data: ${JSON.stringify({ firstName, lastName, email })}`
+			`User registered successfully: ${JSON.stringify(responseData)}`
 		);
-
 		res.status(201).json({
 			message: 'User registered successfully',
+			...responseData,
 		});
 	}
 }
