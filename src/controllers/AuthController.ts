@@ -2,6 +2,7 @@ import { NextFunction, Response } from 'express';
 import logger from '../confiig/logger';
 import { RegisterUserRequest } from '../types';
 import { UserService } from '../services/UserService';
+import { Roles } from '../constants';
 
 export class AuthController {
 	constructor(private userService: UserService) {}
@@ -19,6 +20,7 @@ export class AuthController {
 				lastName,
 				email,
 				password,
+				role: Roles.CUSTOMER,
 			});
 			const responseData = {
 				userId: savedUser.id,
