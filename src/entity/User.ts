@@ -11,5 +11,5 @@ export class User {
 	@Column({ unique: true })
 	email: string;
 	@Column()
-	password: string; // In a real application, ensure to hash the password before saving
+	password: string;
 }
