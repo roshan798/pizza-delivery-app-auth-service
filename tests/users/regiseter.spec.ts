@@ -66,7 +66,6 @@ describe('POST auth/register', () => {
 			expect(users[0].firstName).toBe(user.firstName);
 			expect(users[0].lastName).toBe(user.lastName);
 			expect(users[0].email).toBe(user.email);
-			expect(users[0].password).toBe(user.password);
 		});
 
 		it('should return a valid userId in response', async () => {
@@ -95,6 +94,21 @@ describe('POST auth/register', () => {
 			const users = await userRepo.find();
 			expect(users[0]).toHaveProperty('role');
 			expect(users[0].role).toBe('customer');
+		});
+
+		it('should hash the password', async () => {
+			const user = {
+				firstName: 'John',
+				lastName: 'Doe',
+				email: 'roshan@gmail.com',
+				password: 'password123',
+			};
+			await request(app).post('/auth/register').send(user);
+			const userRepo = connection.getRepository('User');
+			const users = await userRepo.find();
+			expect(users[0].password).not.toBe(user.password);
+			expect(users[0].password).toHaveLength(60); // bcrypt hashes are 60 characters long
+			expect(users[0].password).toMatch(/^\$2[ayb]\$.{56}$/); // Matches bcrypt hash format
 		});
 	});
 
