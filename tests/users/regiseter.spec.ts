@@ -100,6 +100,8 @@ describe('POST auth/register', () => {
 				(e) => e.msg === 'Email already exists'
 			);
 			expect(hasEmailAlreadyExistError).toBeTruthy();
+			const users = await userRepo.find();
+			expect(users.length).toBe(1);
 		});
 	});
 
@@ -146,9 +148,99 @@ describe('POST auth/register', () => {
 				(e) => e.msg === 'Email is Required!'
 			);
 			expect(hasEmailisRequiredError).toBeTruthy();
+			const userRepo = connection.getRepository('User');
+			const users = await userRepo.find();
+			expect(users.length).toBe(0);
 		});
 
-		it('should trim the e email field if it has leading or trailing spaces', async () => {
+		it('should return 400 status code if firstName field is missing', async () => {
+			const userWithoutFirstName = {
+				...user,
+				firstName: '',
+			};
+			const response = await request(app)
+				.post('/auth/register')
+				.send(userWithoutFirstName);
+			expect(response.statusCode).toBe(400);
+			expect(response.body.errors).toBeDefined();
+			const errors: { msg: string }[] = response.body.errors;
+			const hasFirstNameisRequiredError = errors.some(
+				(e) => e.msg === 'First Name is Required!'
+			);
+			expect(hasFirstNameisRequiredError).toBeTruthy();
+			const userRepo = connection.getRepository('User');
+			const users = await userRepo.find();
+			expect(users.length).toBe(0);
+		});
+
+		it('should return 400 status code if lastName field is missing', async () => {
+			const userWithoutLastName = {
+				...user,
+				lastName: '',
+			};
+			const response = await request(app)
+				.post('/auth/register')
+				.send(userWithoutLastName);
+			expect(response.statusCode).toBe(400);
+			expect(response.body.errors).toBeDefined();
+			const errors: { msg: string }[] = response.body.errors;
+			const hasLastNameisRequiredError = errors.some(
+				(e) => e.msg === 'Last Name is Required!'
+			);
+			expect(hasLastNameisRequiredError).toBeTruthy();
+			const userRepo = connection.getRepository('User');
+			const users = await userRepo.find();
+			expect(users.length).toBe(0);
+		});
+
+		it('should return 400 status code if password field is missing', async () => {
+			const userWithoutPassword = {
+				...user,
+				password: '',
+			};
+			const response = await request(app)
+				.post('/auth/register')
+				.send(userWithoutPassword);
+			expect(response.statusCode).toBe(400);
+			expect(response.body.errors).toBeDefined();
+			const errors: { msg: string }[] = response.body.errors;
+			const hasPasswordisRequiredError = errors.some(
+				(e) => e.msg === 'Password is Required!'
+			);
+			expect(hasPasswordisRequiredError).toBeTruthy();
+			const userRepo = connection.getRepository('User');
+			const users = await userRepo.find();
+			expect(users.length).toBe(0);
+		});
+	});
+
+	describe('fields are not properly formatted', () => {
+		const user = {
+			firstName: 'John',
+			lastName: 'Doe',
+			email: 'roshan@gmail.com',
+			password: 'password123',
+			role: 'customer',
+		};
+		let connection: DataSource;
+		// This will run before all tests in this block
+		// It is used to initialize the database connection
+		beforeAll(async () => {
+			connection = await AppDataSource.initialize();
+		});
+
+		// This will run before each test in this block
+		beforeEach(async () => {
+			await connection.dropDatabase();
+			await connection.synchronize();
+		});
+
+		// This will run after all tests in this block
+		afterAll(async () => {
+			await connection.destroy();
+		});
+
+		it('should trim the email field if it has leading or trailing spaces', async () => {
 			const userWithSpaces = {
 				...user,
 				email: '    roshan@gmail.com ',
@@ -161,6 +253,66 @@ describe('POST auth/register', () => {
 			const users = await userRepo.find();
 			expect(users.length).toBe(1);
 			expect(users[0].email).toBe('roshan@gmail.com');
+		});
+
+		it('should trim all fields if they have leading or trailing spaces', async () => {
+			const userWithSpaces = {
+				...user,
+				firstName: '   John   ',
+				lastName: '   Doe   ',
+				email: 'roshan@gmail.com   ',
+				password: '   password123   ',
+			};
+			const response = await request(app)
+				.post('/auth/register')
+				.send(userWithSpaces);
+			expect(response.statusCode).toBe(201);
+			const userRepo = connection.getRepository('User');
+			const users = await userRepo.find();
+			expect(users.length).toBe(1);
+			expect(users[0].firstName).toBe('John');
+			expect(users[0].lastName).toBe('Doe');
+			expect(users[0].email).toBe('roshan@gmail.com');
+		});
+
+		it('should have password with at least 6 characters', async () => {
+			const userWithShortPassword = {
+				...user,
+				password: '123',
+			};
+			const response = await request(app)
+				.post('/auth/register')
+				.send(userWithShortPassword);
+			expect(response.statusCode).toBe(400);
+			expect(response.body.errors).toBeDefined();
+			const errors: { msg: string }[] = response.body.errors;
+			const hasPasswordLengthError = errors.some(
+				(e) => e.msg === 'Password must be at least 6 characters long'
+			);
+			expect(hasPasswordLengthError).toBeTruthy();
+			const userRepo = connection.getRepository('User');
+			const users = await userRepo.find();
+			expect(users.length).toBe(0);
+		});
+
+		it('should have email in correct format', async () => {
+			const userWithInvalidEmail = {
+				...user,
+				email: 'invalid-email',
+			};
+			const response = await request(app)
+				.post('/auth/register')
+				.send(userWithInvalidEmail);
+			expect(response.statusCode).toBe(400);
+			expect(response.body.errors).toBeDefined();
+			const errors: { msg: string }[] = response.body.errors;
+			const hasEmailFormatError = errors.some(
+				(e) => e.msg === 'Invalid email format!'
+			);
+			expect(hasEmailFormatError).toBeTruthy();
+			const userRepo = connection.getRepository('User');
+			const users = await userRepo.find();
+			expect(users.length).toBe(0);
 		});
 	});
 });
