@@ -14,7 +14,7 @@ export class UserService {
 	async create({ firstName, lastName, email, password }: UserData) {
 		try {
 			logger.info(
-				`Creating user with data: ${JSON.stringify({ firstName, lastName, email, password })}`
+				`Creating user with data: ${JSON.stringify({ firstName, lastName, email })}`
 			);
 			// Check if user already exists
 			const existingUser = await this.userRepo.findOneBy({ email });

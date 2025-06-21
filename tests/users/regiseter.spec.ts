@@ -98,5 +98,44 @@ describe('POST auth/register', () => {
 		});
 	});
 
-	describe('Missing some or all fields', () => {});
+	describe('Missing some or all fields', () => {
+		const user = {
+			firstName: 'John',
+			lastName: 'Doe',
+			email: 'roshan@gmail.com',
+			password: 'password123',
+			role: 'customer',
+		};
+
+		let connection: DataSource;
+
+		// This will run before all tests in this block
+		// It is used to initialize the database connection
+		beforeAll(async () => {
+			connection = await AppDataSource.initialize();
+		});
+
+		// This will run before each test in this block
+		beforeEach(async () => {
+			await connection.dropDatabase();
+			await connection.synchronize();
+		});
+
+		// This will run after all tests in this block
+		afterAll(async () => {
+			await connection.destroy();
+		});
+
+		it('should return 400 status code if email field is missing', async () => {
+			const userWithoutEmail = {
+				...user,
+				email: '',
+			};
+			const response = await request(app)
+				.post('/auth/register')
+				.send(userWithoutEmail);
+			expect(response.statusCode).toBe(400);
+			expect(response.body.message).toBe('Email is required!');
+		});
+	});
 });
