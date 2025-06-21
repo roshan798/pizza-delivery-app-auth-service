@@ -18,11 +18,16 @@ app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
 	logger.error('Error details:', { error: err.message });
 	const status = err.status || 500;
 	const message = err.message || 'Internal Server Error';
+	logger.error(`Error occurred: ${message} (Status: ${status})`);
 	res.status(status).json({
-		type: err.name || 'UnknownError',
-		message: message,
-		stack: '', // Config.NODE_ENV === 'development' ? err.stack : undefined,
-		path: req.originalUrl,
+		errors: [
+			{
+				type: err.name || 'UnknownError',
+				message: message,
+				stack: '',
+				path: req.originalUrl,
+			},
+		],
 	});
 });
 export default app;

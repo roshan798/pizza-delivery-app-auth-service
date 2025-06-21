@@ -2,7 +2,7 @@ import { NextFunction, Response } from 'express';
 import logger from '../confiig/logger';
 import { RegisterUserRequest } from '../types';
 import { UserService } from '../services/UserService';
-import createHttpError from 'http-errors';
+import { validationResult } from 'express-validator';
 
 export class AuthController {
 	constructor(private userService: UserService) {}
@@ -13,13 +13,19 @@ export class AuthController {
 	) {
 		logger.info('Register endpoint hit');
 		logger.info(`Request body: ${JSON.stringify(req.body)}`);
+		// Validate request body
+		const validationErrors = validationResult(req);
+		if (!validationErrors.isEmpty()) {
+			logger.error(
+				`Validation errors: ${JSON.stringify(validationErrors.array())}`
+			);
+			return res.status(400).json({
+				message: 'Validation failed',
+				errors: validationErrors.array(),
+			});
+		}
 		try {
 			const { firstName, lastName, email, password } = req.body;
-			if (!email) {
-				const err = createHttpError(400, 'Email is required!');
-				throw err;
-			}
-
 			const savedUser = await this.userService.create({
 				firstName,
 				lastName,

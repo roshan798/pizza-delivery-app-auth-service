@@ -94,7 +94,12 @@ describe('POST auth/register', () => {
 				.post('/auth/register')
 				.send(user);
 			expect(response.statusCode).toBe(400);
-			expect(response.body.message).toBe('Email already exists');
+			expect(response.body.errors).toBeDefined();
+			const errors: { msg: string }[] = response.body.errors;
+			const hasEmailAlreadyExistError = errors.some(
+				(e) => e.msg === 'Email already exists'
+			);
+			expect(hasEmailAlreadyExistError).toBeTruthy();
 		});
 	});
 
@@ -135,7 +140,12 @@ describe('POST auth/register', () => {
 				.post('/auth/register')
 				.send(userWithoutEmail);
 			expect(response.statusCode).toBe(400);
-			expect(response.body.message).toBe('Email is required!');
+			expect(response.body.errors).toBeDefined();
+			const errors: { msg: string }[] = response.body.errors;
+			const hasEmailisRequiredError = errors.some(
+				(e) => e.msg === 'Email is Required!'
+			);
+			expect(hasEmailisRequiredError).toBeTruthy();
 		});
 	});
 });

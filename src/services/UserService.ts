@@ -16,14 +16,7 @@ export class UserService {
 			logger.info(
 				`Creating user with data: ${JSON.stringify({ firstName, lastName, email })}`
 			);
-			// Check if user already exists
-			const existingUser = await this.userRepo.findOneBy({ email });
-			if (existingUser) {
-				logger.warn(`User with email ${email} already exists`);
-				const error = createHttpError(400, 'Email already exists');
-				throw error;
-			}
-			logger.info(`No existing user found with email: ${email}`);
+
 			const hashedPassword =
 				await this.hashService.hashPassword(password);
 			const userData = {
