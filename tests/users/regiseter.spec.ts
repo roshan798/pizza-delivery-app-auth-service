@@ -110,6 +110,22 @@ describe('POST auth/register', () => {
 			expect(users[0].password).toHaveLength(60); // bcrypt hashes are 60 characters long
 			expect(users[0].password).toMatch(/^\$2[ayb]\$.{56}$/); // Matches bcrypt hash format
 		});
+		it('should return 400 status code for duplicate email', async () => {
+			const user = {
+				firstName: 'John',
+				lastName: 'Doe',
+				email: 'roshan@gmail.com',
+				password: 'password123',
+				role: 'customer',
+			};
+			const userRepo = connection.getRepository('User');
+			await userRepo.save(user);
+			const response = await request(app)
+				.post('/auth/register')
+				.send(user);
+			expect(response.statusCode).toBe(400);
+			expect(response.body.message).toBe('Email already exists');
+		});
 	});
 
 	describe('Missing some or all fields', () => {});
