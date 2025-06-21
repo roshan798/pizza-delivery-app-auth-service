@@ -5,12 +5,10 @@ import logger from '../confiig/logger';
 
 export default checkSchema({
 	email: {
-		isEmail: {
-			errorMessage: 'Invalid email format!',
-		},
 		notEmpty: {
 			errorMessage: 'Email is Required!',
 		},
+		trim: true,
 		custom: {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			options: async (email: string, { req }) => {

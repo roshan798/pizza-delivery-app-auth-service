@@ -147,5 +147,20 @@ describe('POST auth/register', () => {
 			);
 			expect(hasEmailisRequiredError).toBeTruthy();
 		});
+
+		it('should trim the e email field if it has leading or trailing spaces', async () => {
+			const userWithSpaces = {
+				...user,
+				email: '    roshan@gmail.com ',
+			};
+			const response = await request(app)
+				.post('/auth/register')
+				.send(userWithSpaces);
+			expect(response.statusCode).toBe(201);
+			const userRepo = connection.getRepository('User');
+			const users = await userRepo.find();
+			expect(users.length).toBe(1);
+			expect(users[0].email).toBe('roshan@gmail.com');
+		});
 	});
 });
