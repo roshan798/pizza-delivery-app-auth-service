@@ -3,7 +3,7 @@
 This is the **Authentication Microservice** for the Pizza Delivery App.
 It handles user registration, login, role management, and authentication-related operations.
 
----
+<!-- --- -->
 
 <!-- ## 📁 Project Structure
 
@@ -120,7 +120,7 @@ npm run lint:fix
 npm run format:fix
 ```
 
----
+<!-- --- -->
 
 <!-- ## ✨ Features
 
@@ -130,13 +130,13 @@ npm run format:fix
 * 👯‍♂️ Role-based access support (`admin`, `customer`, `manager`)
 * 🧰 Fully tested endpoints -->
 
----
+<!-- --- -->
 
 <!-- ## 📄 License
 
 [ISC License](LICENSE) -->
 
----
+<!-- --- -->
 
 ## 👨‍💼 Author
 
