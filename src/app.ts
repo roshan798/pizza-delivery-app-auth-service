@@ -12,7 +12,6 @@ app.use(express.json());
 app.use('/auth', authRouter);
 
 // globlal error handler
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
 	logger.info('Global error handler triggered');
@@ -20,14 +19,10 @@ app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
 	const status = err.status || 500;
 	const message = err.message || 'Internal Server Error';
 	res.status(status).json({
-		errors: [
-			{
-				type: err.name || 'UnknownError',
-				message: message,
-				stack: '', // Config.NODE_ENV === 'development' ? err.stack : undefined,
-				path: req.originalUrl,
-			},
-		],
+		type: err.name || 'UnknownError',
+		message: message,
+		stack: '', // Config.NODE_ENV === 'development' ? err.stack : undefined,
+		path: req.originalUrl,
 	});
 });
 export default app;

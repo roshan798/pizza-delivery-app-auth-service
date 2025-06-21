@@ -16,6 +16,14 @@ export class UserService {
 			logger.info(
 				`Creating user with data: ${JSON.stringify({ firstName, lastName, email, password })}`
 			);
+			// Check if user already exists
+			const existingUser = await this.userRepo.findOneBy({ email });
+			if (existingUser) {
+				logger.warn(`User with email ${email} already exists`);
+				const error = createHttpError(400, 'Email already exists');
+				throw error;
+			}
+			logger.info(`No existing user found with email: ${email}`);
 			const hashedPassword =
 				await this.hashService.hashPassword(password);
 			const userData = {
@@ -29,7 +37,10 @@ export class UserService {
 			logger.info(`User created with ID: ${savedUser.id}`);
 			return savedUser;
 		} catch (err) {
-			if (err instanceof Error) {
+			if (err instanceof createHttpError.HttpError) {
+				logger.error(`HTTP error creating user: ${err.message}`);
+				throw err;
+			} else if (err instanceof Error) {
 				logger.error(`Error creating user: ${err.message}`);
 			} else {
 				logger.error(`Error creating user: ${JSON.stringify(err)}`);
