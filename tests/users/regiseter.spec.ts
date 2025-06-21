@@ -4,6 +4,13 @@ import { DataSource } from 'typeorm';
 import { AppDataSource } from '../../src/confiig/data-source';
 describe('POST auth/register', () => {
 	describe('Given all fields', () => {
+		const user = {
+			firstName: 'John',
+			lastName: 'Doe',
+			email: 'roshan@gmail.com',
+			password: 'password123',
+			role: 'customer',
+		};
 		let connection: DataSource;
 
 		// This will run before all tests in this block
@@ -26,12 +33,6 @@ describe('POST auth/register', () => {
 		it('should return 201 status code', async () => {
 			// AAA
 			// 1. Arrange
-			const user = {
-				firstName: 'John',
-				lastName: 'Doe',
-				email: 'test@email.com',
-				password: 'password123',
-			};
 			// 2. Act
 			const response = await request(app)
 				.post('/auth/register')
@@ -41,24 +42,12 @@ describe('POST auth/register', () => {
 		});
 
 		it('should return valid JSON response', async () => {
-			const user = {
-				firstName: 'John',
-				lastName: 'Doe',
-				email: 'test@email.com',
-				password: 'password123',
-			};
 			const response = await request(app)
 				.post('/auth/register')
 				.send(user);
 			expect(response.headers['content-type']).toMatch(/json/);
 		});
 		it('should persist user in the database', async () => {
-			const user = {
-				firstName: 'John',
-				lastName: 'Doe',
-				email: 'test@email.com',
-				password: 'password123',
-			};
 			await request(app).post('/auth/register').send(user);
 			const userRepo = connection.getRepository('User');
 			const users = await userRepo.find();
@@ -69,12 +58,6 @@ describe('POST auth/register', () => {
 		});
 
 		it('should return a valid userId in response', async () => {
-			const user = {
-				firstName: 'John',
-				lastName: 'Doe',
-				email: 'test@email.com',
-				password: 'password123',
-			};
 			const response = await request(app)
 				.post('/auth/register')
 				.send(user);
@@ -83,12 +66,6 @@ describe('POST auth/register', () => {
 		});
 
 		it('should assign customer role', async () => {
-			const user = {
-				firstName: 'John',
-				lastName: 'Doe',
-				email: 'test@email.com',
-				password: 'password123',
-			};
 			await request(app).post('/auth/register').send(user);
 			const userRepo = connection.getRepository('User');
 			const users = await userRepo.find();
@@ -111,13 +88,6 @@ describe('POST auth/register', () => {
 			expect(users[0].password).toMatch(/^\$2[ayb]\$.{56}$/); // Matches bcrypt hash format
 		});
 		it('should return 400 status code for duplicate email', async () => {
-			const user = {
-				firstName: 'John',
-				lastName: 'Doe',
-				email: 'roshan@gmail.com',
-				password: 'password123',
-				role: 'customer',
-			};
 			const userRepo = connection.getRepository('User');
 			await userRepo.save(user);
 			const response = await request(app)
