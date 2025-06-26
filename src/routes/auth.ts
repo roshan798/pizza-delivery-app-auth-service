@@ -6,13 +6,15 @@ import { User } from '../entity/User';
 import { HashService } from '../services/HashService';
 import registerValidator from '../validators/register-validators';
 import { TokenService } from '../services/TokenService';
+import { RefreshToken } from '../entity/RefreshToken';
 
 const router = express.Router();
 
 const userRepository = AppDataSource.getRepository(User);
+const refreshTokenRepo = AppDataSource.getRepository(RefreshToken);
 const hashService = new HashService();
 const userService = new UserService(userRepository, hashService);
-const tokenService = new TokenService();
+const tokenService = new TokenService(refreshTokenRepo);
 const authController = new AuthController(userService, tokenService);
 
 router.post(

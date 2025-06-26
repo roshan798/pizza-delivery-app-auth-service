@@ -4,12 +4,16 @@ import { JwtPayload, sign } from 'jsonwebtoken';
 import logger from '../confiig/logger';
 import createHttpError from 'http-errors';
 import { Config } from '../confiig';
+import { Repository } from 'typeorm';
+import { RefreshToken } from '../entity/RefreshToken';
+import { User as UserType } from '../types/index';
 
 export interface Payload {
 	userId: string;
 	role: string;
 }
 export class TokenService {
+	constructor(private refreshTokenRepo: Repository<RefreshToken>) {}
 	generateAccessToken(payload: Payload) {
 		logger.info('Entering generateAccessToken of TokenService');
 		let privateKey: Buffer;
@@ -51,5 +55,14 @@ export class TokenService {
 		});
 
 		return refreshToken;
+	}
+
+	async persistRefreshToken(user: UserType) {
+		const MS_IN_YEAR = 1000 * 60 * 60 * 24 * 365; // TODO : 366 if leap year
+		const newRefreshToken = await this.refreshTokenRepo.save({
+			user: user,
+			expiresAt: new Date(Date() + MS_IN_YEAR),
+		});
+		return newRefreshToken;
 	}
 }

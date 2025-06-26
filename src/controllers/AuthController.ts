@@ -4,8 +4,6 @@ import { RegisterUserRequest } from '../types';
 import { UserService } from '../services/UserService';
 import { validationResult } from 'express-validator';
 import { Payload, TokenService } from '../services/TokenService';
-import { AppDataSource } from '../confiig/data-source';
-import { RefreshToken } from '../entity/RefreshToken';
 
 export class AuthController {
 	constructor(
@@ -37,28 +35,14 @@ export class AuthController {
 				email,
 				password,
 			});
-			const responseData = {
-				userId: savedUser.id,
-				firstName: savedUser.firstName,
-				lastName: savedUser.lastName,
-				email: savedUser.email,
-			};
-			logger.info(
-				`User registered successfully: ${JSON.stringify(responseData)}`
-			);
-
-			const refreshTokenRepo = AppDataSource.getRepository(RefreshToken);
-			const MS_IN_YEAR = 1000 * 60 * 60 * 24 * 365; // TODO : 366 if leap year
-			const newRefreshToken = await refreshTokenRepo.save({
-				user: savedUser,
-				expiresAt: new Date(Date() + MS_IN_YEAR),
-			});
 
 			const payload: Payload = {
 				userId: savedUser.id.toString(),
 				role: savedUser.role,
 			};
 			const accessToken = this.tokenService.generateAccessToken(payload);
+			const newRefreshToken =
+				await this.tokenService.persistRefreshToken(savedUser);
 			const refreshToken = this.tokenService.generateRefreshToken(
 				payload,
 				newRefreshToken.user.id
@@ -76,6 +60,16 @@ export class AuthController {
 				domain: 'localhost',
 				sameSite: 'strict',
 			});
+
+			const responseData = {
+				userId: savedUser.id,
+				firstName: savedUser.firstName,
+				lastName: savedUser.lastName,
+				email: savedUser.email,
+			};
+			logger.info(
+				`User registered successfully: ${JSON.stringify(responseData)}`
+			);
 
 			res.status(201).json({
 				message: 'User registered successfully',

@@ -14,19 +14,6 @@ const {
 	JWT_SECRET,
 } = process.env;
 
- 
-// console.log('Environment Variables:', {
-// 	PORT,
-// 	HOST,
-// 	DB_HOST,
-// 	DB_PORT,
-// 	DB_USERNAME,
-// 	DB_PASSWORD,
-// 	DB_NAME,
-// 	DB_LOGGING,
-// 	JWT_SECRET
-// });
-
 export const Config = {
 	PORT,
 	HOST,
