@@ -2,6 +2,7 @@ import request from 'supertest';
 import app from '../../src/app';
 import { DataSource } from 'typeorm';
 import { AppDataSource } from '../../src/confiig/data-source';
+import { RefreshToken } from '../../src/entity/RefreshToken';
 describe('POST auth/register', () => {
 	describe('Given all fields', () => {
 		const user = {
@@ -102,6 +103,65 @@ describe('POST auth/register', () => {
 			expect(hasEmailAlreadyExistError).toBeTruthy();
 			const users = await userRepo.find();
 			expect(users.length).toBe(1);
+		});
+
+		it('should return access token and refresh token in cookie', async () => {
+			const response = await request(app)
+				.post('/auth/register')
+				.send(user);
+
+			interface Headers {
+				['set-cookie']: string[];
+			}
+			let accessTokenCookie: string | null = null;
+			let refreshTokenCookie: string | null = null;
+			const cookies =
+				(response.headers as unknown as Headers)['set-cookie'] || [];
+
+			cookies.forEach((cookie) => {
+				if (cookie.startsWith('accessToken=')) {
+					accessTokenCookie = cookie.split('=')[1].split(';')[0]; // Extract the value of accessToken cookie
+				} else if (cookie.startsWith('refreshToken=')) {
+					refreshTokenCookie = cookie.split('=')[1].split(';')[0]; // Extract the value of accessToken cookie
+				}
+			});
+			expect(response.statusCode).toBe(201);
+			expect(response.headers['set-cookie']).toBeDefined(); // set-cookie header should be present if tokens are set in cookie
+
+			expect(accessTokenCookie).not.toBeNull();
+			expect(refreshTokenCookie).not.toBeNull();
+
+			expect(isValidCookieFormat(accessTokenCookie)).toBeTruthy();
+			expect(isValidCookieFormat(refreshTokenCookie)).toBeTruthy();
+		});
+
+		function isValidCookieFormat(cookie: string | null): boolean {
+			if (cookie === null) return false;
+
+			const parts = cookie.split('.');
+			if (parts.length !== 3) return false; // JWT should have 3 parts
+			parts.forEach((part) => {
+				try {
+					Buffer.from(part, 'base64').toString(); // Validate base64 encoding
+				} catch (e) {
+					return false; // If JSON parsing fails, it's not a valid JWT
+				}
+			});
+			return true; // If all parts are valid, it's a valid JWT
+		}
+
+		it('should store the refreshToken in DB', async () => {
+			const response = await request(app)
+				.post('/auth/register')
+				.send(user);
+			console.log(response);
+			const userId = response.body.userId;
+			const refreshTokenRepo = connection.getRepository(RefreshToken);
+			const refreshTokens = await refreshTokenRepo
+				.createQueryBuilder('refreshToken')
+				.where('refreshToken.userId = :userId', { userId })
+				.getMany();
+			expect(refreshTokens).toHaveLength(1);
 		});
 	});
 

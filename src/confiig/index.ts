@@ -11,19 +11,21 @@ const {
 	DB_PASSWORD,
 	DB_NAME,
 	DB_LOGGING,
+	JWT_SECRET,
 } = process.env;
 
-// eslint-disable-next-line no-console
-console.log('Environment Variables:', {
-	PORT,
-	HOST,
-	DB_HOST,
-	DB_PORT,
-	DB_USERNAME,
-	DB_PASSWORD,
-	DB_NAME,
-	DB_LOGGING,
-});
+ 
+// console.log('Environment Variables:', {
+// 	PORT,
+// 	HOST,
+// 	DB_HOST,
+// 	DB_PORT,
+// 	DB_USERNAME,
+// 	DB_PASSWORD,
+// 	DB_NAME,
+// 	DB_LOGGING,
+// 	JWT_SECRET
+// });
 
 export const Config = {
 	PORT,
@@ -36,4 +38,5 @@ export const Config = {
 	DB_PASSWORD,
 	DB_NAME,
 	DB_LOGGING: DB_LOGGING === 'true' || DB_LOGGING === '1' ? true : false,
+	JWT_SECRET,
 };
