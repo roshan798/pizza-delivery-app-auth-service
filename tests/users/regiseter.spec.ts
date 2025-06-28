@@ -3,6 +3,7 @@ import app from '../../src/app';
 import { DataSource } from 'typeorm';
 import { AppDataSource } from '../../src/confiig/data-source';
 import { RefreshToken } from '../../src/entity/RefreshToken';
+import { isValidCookieFormat } from '../utils';
 describe('POST auth/register', () => {
 	describe('Given all fields', () => {
 		const user = {
@@ -135,21 +136,6 @@ describe('POST auth/register', () => {
 			expect(isValidCookieFormat(accessTokenCookie)).toBeTruthy();
 			expect(isValidCookieFormat(refreshTokenCookie)).toBeTruthy();
 		});
-
-		function isValidCookieFormat(cookie: string | null): boolean {
-			if (cookie === null) return false;
-
-			const parts = cookie.split('.');
-			if (parts.length !== 3) return false; // JWT should have 3 parts
-			parts.forEach((part) => {
-				try {
-					Buffer.from(part, 'base64').toString(); // Validate base64 encoding
-				} catch (e) {
-					return false; // If JSON parsing fails, it's not a valid JWT
-				}
-			});
-			return true; // If all parts are valid, it's a valid JWT
-		}
 
 		it('should store the refreshToken in DB', async () => {
 			const response = await request(app)
