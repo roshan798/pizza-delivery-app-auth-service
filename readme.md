@@ -3,26 +3,51 @@
 This is the **Authentication Microservice** for the Pizza Delivery App.
 It handles user registration, login, role management, and authentication-related operations.
 
-<!-- --- -->
-
-<!-- ## 📁 Project Structure
+<!--
+## 📁 Project Structure
 
 ```
-src/
-🔼📝 config/         # Environment and DB config
-🔼📜 controllers/    # Route handlers
-🔼📏 routes/         # Express route definitions
-🔼📊 services/       # Business logic (e.g., user registration)
-🔼📄 models/         # TypeORM entities / schemas
-🔼🔧 utils/          # Error handling, helpers
-🔺 server.ts       # Entry point
-``` -->
+app.spec.ts                # Example test file
+eslint.config.mjs          # ESLint configuration
+jest.config.js             # Jest configuration
+package.json               # Project manifest
+readme.md                  # Project documentation
+tsconfig.json              # TypeScript configuration
+.prettierrc                # Prettier configuration
+certs/                     # SSL certificates
+  privateKey.pem
+  publicKey.pem
+docker/
+  dev/
+    Dockerfile             # Dockerfile for development
+logs/                      # Log files
+  combined.log
+  error.log
+scripts/                   # Utility scripts
+  generatePrivateKey.mjs   # Script to generate private key
+src/                       # Source code
+  app.ts                   # Express app
+  server.ts                # Entry point
+  utils.ts                 # Utility functions
+  config/                  # Configuration files
+  controllers/             # Route handlers
+  entity/                  # TypeORM entities
+  migration/               # DB migrations
+  routes/                  # Express routes
+  services/                # Business logic
+  types/                   # Type definitions
+  validators/              # Input validators
+tests/                     # Test files
+  users/
+  utils/
+```
+-->
 
 ---
 
 ## ⚙️ Tech Stack
 
-- **Node.js** with **TypeScript**
+- **Node.js** (>=22.10.0) with **TypeScript** (strict mode)
 - **Express.js** for API
 - **PostgreSQL** as the database (via Docker)
 - **TypeORM** for database ORM
@@ -35,15 +60,17 @@ src/
 
 ## 📦 Scripts
 
-| Script                 | Description                     |
-| ---------------------- | ------------------------------- |
-| `npm run dev`          | Start the server with `nodemon` |
-| `npm start`            | Start the production server     |
-| `npm run lint:check`   | Check code with ESLint          |
-| `npm run lint:fix`     | Auto-fix lint issues            |
-| `npm run format:check` | Check formatting with Prettier  |
-| `npm run format:fix`   | Auto-fix formatting issues      |
-| `npm test`             | Run test suites using Jest      |
+| Script                 | Description                          |
+| ---------------------- | ------------------------------------ |
+| `npm run dev`          | Start the server with ts-node-dev    |
+| `npm start`            | Start the production server          |
+| `npm run build`        | Compile TypeScript to JavaScript     |
+| `npm run lint:check`   | Check code with ESLint               |
+| `npm run lint:fix`     | Auto-fix lint issues                 |
+| `npm run format:check` | Check formatting with Prettier       |
+| `npm run format:fix`   | Auto-fix formatting issues           |
+| `npm test`             | Run test suites using Jest           |
+| `npm run start:DB`     | Start PostgreSQL DB via Docker       |
 
 ---
 
@@ -74,10 +101,18 @@ cp .env.test.example .env.test
 
 Update them with your Postgres credentials and configs.
 
-### 4. Run PostgreSQL with Docker
+### 4. Download PostgreSQL Docker Image (if not already present)
 
 ```bash
-docker-compose up -d
+docker pull postgres
+```
+
+### 5. Start PostgreSQL with Docker
+
+You can use the provided npm script:
+
+```bash
+npm run start:DB
 ```
 
 Or manually:
@@ -86,7 +121,21 @@ Or manually:
 docker run --name pg-auth -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -e POSTGRES_DB=auth-service -p 5432:5432 -d postgres
 ```
 
-### 5. Start the Server
+### 6. Generate Private/Public Keys (if needed)
+
+```bash
+node scripts/generatePrivateKey.mjs
+```
+
+This will generate the necessary keys in the `certs/` directory.
+
+### 7. Build the Project
+
+```bash
+npm run build
+```
+
+### 8. Start the Server
 
 ```bash
 # For development
@@ -120,27 +169,17 @@ npm run lint:fix
 npm run format:fix
 ```
 
-<!-- --- -->
+---
 
-<!-- ## ✨ Features
+## 🛡️ Pre-commit Hooks
 
-* 🔐 Secure password hashing
-* 📾 Custom error handling (`HttpError`, `ValidationError`)
-* 📜 Typed request validation
-* 👯‍♂️ Role-based access support (`admin`, `customer`, `manager`)
-* 🧰 Fully tested endpoints -->
+Husky and lint-staged are configured to automatically format and lint staged files before each commit.
 
-<!-- --- -->
-
-<!-- ## 📄 License
-
-[ISC License](LICENSE) -->
-
-<!-- --- -->
+---
 
 ## 👨‍💼 Author
 
-**Roshan Kumar**
+**Roshan Kumar**  
 [GitHub](https://github.com/roshan798) • [LinkedIn](https://www.linkedin.com/in/roshan-kumar7989/)
 
 ---
