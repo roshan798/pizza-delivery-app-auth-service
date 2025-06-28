@@ -12,3 +12,9 @@ export interface User extends Omit<UserData, 'password'> {
 	id: number;
 	role: string;
 }
+export interface LoginUserRequest extends request {
+	body: {
+		email: string;
+		password: string;
+	};
+}

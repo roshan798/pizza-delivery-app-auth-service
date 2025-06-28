@@ -154,7 +154,6 @@ describe('POST auth/register', () => {
 			const response = await request(app)
 				.post('/auth/register')
 				.send(user);
-			console.log(response);
 			const userId = response.body.userId;
 			const refreshTokenRepo = connection.getRepository(RefreshToken);
 			const refreshTokens = await refreshTokenRepo

@@ -1,14 +1,17 @@
 import { NextFunction, Response } from 'express';
 import logger from '../confiig/logger';
-import { RegisterUserRequest } from '../types';
+import { LoginUserRequest, RegisterUserRequest } from '../types';
 import { UserService } from '../services/UserService';
-import { validationResult } from 'express-validator';
 import { Payload, TokenService } from '../services/TokenService';
+import { CredentialService } from '../services/CredentialService';
+import { validationResult } from 'express-validator';
+import createHttpError from 'http-errors';
 
 export class AuthController {
 	constructor(
 		private userService: UserService,
-		private tokenService: TokenService
+		private tokenService: TokenService,
+		private credentialService: CredentialService
 	) {}
 	async register(
 		req: RegisterUserRequest,
@@ -74,6 +77,80 @@ export class AuthController {
 			res.status(201).json({
 				message: 'User registered successfully',
 				...responseData,
+			});
+		} catch (err) {
+			next(err);
+		}
+	}
+
+	async login(req: LoginUserRequest, res: Response, next: NextFunction) {
+		logger.info('Login endpoint hit');
+		// Validate request body
+		const validationErrors = validationResult(req);
+		if (!validationErrors.isEmpty()) {
+			logger.error(
+				`Validation errors: ${JSON.stringify(validationErrors.array())}`
+			);
+			return res.status(400).json({
+				message: 'Validation failed',
+				errors: validationErrors.array(),
+			});
+		}
+		try {
+			const { email, password } = req.body;
+			logger.debug('request body', {
+				email,
+				password: '*******',
+			});
+
+			const savedUser = await this.userService.getUserByEmail(email);
+			const match = await this.credentialService.comparePassword(
+				password,
+				savedUser.password
+			);
+			if (!match) {
+				next(createHttpError(401, 'Email or Password does not match!'));
+				return;
+			}
+
+			const payload: Payload = {
+				userId: savedUser.id.toString(),
+				role: savedUser.role,
+			};
+			const accessToken = this.tokenService.generateAccessToken(payload);
+			const newRefreshToken =
+				await this.tokenService.persistRefreshToken(savedUser);
+			const refreshToken = this.tokenService.generateRefreshToken(
+				payload,
+				newRefreshToken.user.id
+			);
+
+			res.cookie('accessToken', accessToken, {
+				httpOnly: true,
+				maxAge: 60 * 60 * 1000, // 60 minutes
+				domain: 'localhost',
+				sameSite: 'strict',
+			});
+			res.cookie('refreshToken', refreshToken, {
+				httpOnly: true,
+				maxAge: 30 * 24 * 60 * 60 * 1000,
+				domain: 'localhost',
+				sameSite: 'strict',
+			});
+
+			const responseData = {
+				userId: savedUser.id,
+				firstName: savedUser.firstName,
+				lastName: savedUser.lastName,
+				email: savedUser.email,
+			};
+			logger.info(
+				`User logged in successfully: ${JSON.stringify(responseData)}`
+			);
+
+			res.status(200).json({
+				message: 'Login successful',
+				user: responseData,
 			});
 		} catch (err) {
 			next(err);

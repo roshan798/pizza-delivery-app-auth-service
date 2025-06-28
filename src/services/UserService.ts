@@ -42,4 +42,29 @@ export class UserService {
 			throw error;
 		}
 	}
+
+	async getUserByEmail(email: string) {
+		logger.info('Entering into getUserByEmail of UserService');
+		try {
+			const user = await this.userRepo
+				.createQueryBuilder('user')
+				.where('user.email = :email', { email: email })
+				.getOne();
+			if (!user) {
+				throw createHttpError(401, 'Email or Password does not match!');
+			}
+			return user;
+		} catch (err) {
+			if (err instanceof createHttpError.HttpError) {
+				logger.error(`user not found : ${err.message}`);
+				throw err;
+			} else if (err instanceof Error) {
+				logger.error(`user not found : ${err.message}`);
+			} else {
+				logger.error(`user not found : ${JSON.stringify(err)}`);
+			}
+			const error = createHttpError(500, 'Failed to create user');
+			throw error;
+		}
+	}
 }
