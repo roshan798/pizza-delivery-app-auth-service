@@ -36,15 +36,11 @@ describe('POST auth/login', () => {
 			password: 'password123',
 		};
 		//'should set accessToken and refreshToken cookies on success'
-		it('Should return 200 OK and user details', async () => {
+		it('Should return 200 OK', async () => {
 			const response = await request(app)
 				.post('/auth/login')
 				.send(loginUserData);
 			expect(response.status).toBe(200);
-			expect(response.body).toHaveProperty('user');
-			expect(response.body.user.email).toBe('roshan@gmail.com');
-			expect(response.body.user.firstName).toBe('John');
-			expect(response.body.user.lastName).toBe('Doe');
 		});
 	});
 

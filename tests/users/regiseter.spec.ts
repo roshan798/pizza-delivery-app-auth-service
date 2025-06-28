@@ -48,6 +48,7 @@ describe('POST auth/register', () => {
 				.send(user);
 			expect(response.headers['content-type']).toMatch(/json/);
 		});
+
 		it('should persist user in the database', async () => {
 			await request(app).post('/auth/register').send(user);
 			const userRepo = connection.getRepository('User');
@@ -62,8 +63,8 @@ describe('POST auth/register', () => {
 			const response = await request(app)
 				.post('/auth/register')
 				.send(user);
-			expect(response.body.userId).toBeDefined();
-			expect(typeof response.body.userId).toBe('number');
+			expect(response.body.id).toBeDefined();
+			expect(typeof response.body.id).toBe('number');
 		});
 
 		it('should assign customer role', async () => {
@@ -154,7 +155,7 @@ describe('POST auth/register', () => {
 			const response = await request(app)
 				.post('/auth/register')
 				.send(user);
-			const userId = response.body.userId;
+			const userId = response.body.id;
 			const refreshTokenRepo = connection.getRepository(RefreshToken);
 			const refreshTokens = await refreshTokenRepo
 				.createQueryBuilder('refreshToken')

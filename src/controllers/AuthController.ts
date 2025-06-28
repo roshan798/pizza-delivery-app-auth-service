@@ -76,7 +76,8 @@ export class AuthController {
 
 			res.status(201).json({
 				message: 'User registered successfully',
-				...responseData,
+				success: true,
+				id: responseData.userId,
 			});
 		} catch (err) {
 			next(err);
@@ -150,7 +151,8 @@ export class AuthController {
 
 			res.status(200).json({
 				message: 'Login successful',
-				user: responseData,
+				success: true,
+				id: responseData.userId,
 			});
 		} catch (err) {
 			next(err);
