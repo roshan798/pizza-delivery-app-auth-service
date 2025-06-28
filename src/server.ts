@@ -1,11 +1,14 @@
 import app from './app';
 import { Config } from './confiig';
+import { AppDataSource } from './confiig/data-source';
 import logger from './confiig/logger';
 
-const startServer = () => {
+const startServer = async () => {
 	const url = Config.URL;
 	const port = Config.PORT;
 	try {
+		await AppDataSource.initialize();
+		logger.info('Database connected succesfully');
 		app.listen(port, () => {
 			logger.info(`Server is running on ${url}`);
 		});
@@ -14,5 +17,4 @@ const startServer = () => {
 		process.exit(1);
 	}
 };
-
-startServer();
+void startServer();
