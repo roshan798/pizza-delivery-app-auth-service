@@ -63,7 +63,7 @@ export class UserService {
 			} else {
 				logger.error(`user not found : ${JSON.stringify(err)}`);
 			}
-			const error = createHttpError(500, 'Failed to create user');
+			const error = createHttpError(500, 'Something bad happend');
 			throw error;
 		}
 	}
