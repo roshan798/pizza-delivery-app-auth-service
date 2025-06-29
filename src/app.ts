@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import path from 'node:path';
 import express, { NextFunction, Request, Response } from 'express';
 import logger from './confiig/logger';
 import { HttpError } from 'http-errors';
@@ -10,6 +11,12 @@ app.get('/', (req, res) => {
 	res.json({ message: 'Welcome to Auth-Service 👋' });
 });
 app.use(express.json());
+app.use(
+	express.static(path.join(__dirname, '../public'), {
+		dotfiles: 'allow', // Allow serving dotfiles like .well-known/jwks.json
+		extensions: ['json'], // Serve .json files without needing to specify the extension
+	})
+);
 app.use(cookieParser());
 app.use('/auth', authRouter);
 

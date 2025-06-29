@@ -113,5 +113,5 @@
 		// "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
 		"skipLibCheck": true /* Skip type checking all .d.ts files. */
 	},
-	"include": ["src", "*.spec.ts", "tests/**/*.ts","scripts/**/*.js", "scripts/generatePrivateKey.mjs"],
+	"include": ["src", "*.spec.ts", "tests/**/*.ts","scripts/**/*.mjs", "scripts/generatePrivateKey.mjs"],
 }
