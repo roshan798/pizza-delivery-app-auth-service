@@ -60,17 +60,17 @@ tests/                     # Test files
 
 ## 📦 Scripts
 
-| Script                 | Description                          |
-| ---------------------- | ------------------------------------ |
-| `npm run dev`          | Start the server with ts-node-dev    |
-| `npm start`            | Start the production server          |
-| `npm run build`        | Compile TypeScript to JavaScript     |
-| `npm run lint:check`   | Check code with ESLint               |
-| `npm run lint:fix`     | Auto-fix lint issues                 |
-| `npm run format:check` | Check formatting with Prettier       |
-| `npm run format:fix`   | Auto-fix formatting issues           |
-| `npm test`             | Run test suites using Jest           |
-| `npm run start:DB`     | Start PostgreSQL DB via Docker       |
+| Script                 | Description                       |
+| ---------------------- | --------------------------------- |
+| `npm run dev`          | Start the server with ts-node-dev |
+| `npm start`            | Start the production server       |
+| `npm run build`        | Compile TypeScript to JavaScript  |
+| `npm run lint:check`   | Check code with ESLint            |
+| `npm run lint:fix`     | Auto-fix lint issues              |
+| `npm run format:check` | Check formatting with Prettier    |
+| `npm run format:fix`   | Auto-fix formatting issues        |
+| `npm test`             | Run test suites using Jest        |
+| `npm run start:DB`     | Start PostgreSQL DB via Docker    |
 
 ---
 
