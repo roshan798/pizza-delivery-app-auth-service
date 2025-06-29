@@ -27,6 +27,7 @@ const logger = winston.createLogger({
 			),
 		}),
 		new winston.transports.File({
+			level: 'debug',
 			filename: 'logs/combined.log',
 			format: winston.format.combine(
 				winston.format.timestamp(),

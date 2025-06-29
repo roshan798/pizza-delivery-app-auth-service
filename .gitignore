@@ -139,3 +139,6 @@ dist
 .pnp.*
 
 certs/*
+
+public/
+public/.well-known/jwks.json

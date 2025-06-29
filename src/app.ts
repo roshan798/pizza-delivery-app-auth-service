@@ -25,7 +25,7 @@ app.use('/auth', authRouter);
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
 	logger.info('Global error handler triggered');
 	logger.error('Error details:', { error: err.message });
-	const status = err.status || 500;
+	const status = err.status || err.statusCode || 500;
 	const message = err.message || 'Internal Server Error';
 	logger.error(`Error occurred: ${message} (Status: ${status})`);
 	res.status(status).json({
