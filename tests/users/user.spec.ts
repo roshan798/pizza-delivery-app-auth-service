@@ -99,5 +99,22 @@ describe('GET auth/self', () => {
 			expect(res.body).toHaveProperty('user');
 			expect(res.body.user).not.toHaveProperty('password');
 		});
+
+		it('should return 401 status code', async () => {
+			// register user
+			const user = {
+				firstName: 'John',
+				lastName: 'Doe',
+				email: 'roshan@gmail.com',
+				password: 'password123',
+				role: 'customer',
+			};
+			const userRepo = AppDataSource.getRepository(User);
+			await userRepo.save(user);
+
+			const res = await request(app).get('/auth/self');
+
+			expect(res.status).toBe(401);
+		});
 	});
 });
