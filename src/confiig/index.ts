@@ -12,6 +12,7 @@ const {
 	DB_NAME,
 	DB_LOGGING,
 	JWT_SECRET,
+	JWKS_URI,
 } = process.env;
 
 export const Config = {
@@ -26,4 +27,5 @@ export const Config = {
 	DB_NAME,
 	DB_LOGGING: DB_LOGGING === 'true' || DB_LOGGING === '1' ? true : false,
 	JWT_SECRET,
+	JWKS_URI,
 };

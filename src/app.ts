@@ -3,12 +3,14 @@ import express, { NextFunction, Request, Response } from 'express';
 import logger from './confiig/logger';
 import { HttpError } from 'http-errors';
 import authRouter from './routes/auth';
+import cookieParser from 'cookie-parser';
 const app = express();
 
 app.get('/', (req, res) => {
 	res.json({ message: 'Welcome to Auth-Service 👋' });
 });
 app.use(express.json());
+app.use(cookieParser());
 app.use('/auth', authRouter);
 
 // globlal error handler

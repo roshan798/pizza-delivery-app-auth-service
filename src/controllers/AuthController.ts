@@ -1,6 +1,6 @@
 import { NextFunction, Response } from 'express';
 import logger from '../confiig/logger';
-import { LoginUserRequest, RegisterUserRequest } from '../types';
+import { AuthRequest, LoginUserRequest, RegisterUserRequest } from '../types';
 import { UserService } from '../services/UserService';
 import { Payload, TokenService } from '../services/TokenService';
 import { CredentialService } from '../services/CredentialService';
@@ -156,6 +156,23 @@ export class AuthController {
 			});
 		} catch (err) {
 			next(err);
+		}
+	}
+
+	async self(req: AuthRequest, res: Response, next: NextFunction) {
+		try {
+			const { sub: userId } = req.auth;
+			const user = await this.userService.findById(Number(userId));
+			res.json({
+				success: true,
+				user,
+			});
+		} catch (err: unknown) {
+			const error = createHttpError(
+				500,
+				'Something bad happend : ' + (err as Error).message
+			);
+			next(error);
 		}
 	}
 }

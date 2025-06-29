@@ -12,9 +12,16 @@ export interface User extends Omit<UserData, 'password'> {
 	id: number;
 	role: string;
 }
-export interface LoginUserRequest extends request {
+export interface LoginUserRequest extends Request {
 	body: {
 		email: string;
 		password: string;
+	};
+}
+
+export interface AuthRequest extends Request {
+	auth: {
+		sub: string;
+		role: string;
 	};
 }
