@@ -74,8 +74,30 @@ describe('GET auth/self', () => {
 				.set('Cookie', [`accessToken=${accessToken};`]);
 
 			expect(res.body).toHaveProperty('user');
-			console.log(res.body);
 			expect(res.body.user.id).toBe(savedUser.id);
+		});
+		it('should not return users password', async () => {
+			// register user
+			const user = {
+				firstName: 'John',
+				lastName: 'Doe',
+				email: 'roshan@gmail.com',
+				password: 'password123',
+				role: 'customer',
+			};
+			const userRepo = AppDataSource.getRepository(User);
+			const savedUser = await userRepo.save(user);
+			const accessToken = jwks.token({
+				sub: String(savedUser.id),
+				role: savedUser.role,
+			});
+
+			const res = await request(app)
+				.get('/auth/self')
+				.set('Cookie', [`accessToken=${accessToken};`]);
+
+			expect(res.body).toHaveProperty('user');
+			expect(res.body.user).not.toHaveProperty('password');
 		});
 	});
 });

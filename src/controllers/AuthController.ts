@@ -165,7 +165,7 @@ export class AuthController {
 			const user = await this.userService.findById(Number(userId));
 			res.json({
 				success: true,
-				user,
+				user: { ...user, password: undefined },
 			});
 		} catch (err: unknown) {
 			const error = createHttpError(
