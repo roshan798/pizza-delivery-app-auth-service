@@ -41,9 +41,13 @@ export class TokenService {
 		return accessToken;
 	}
 
-	generateRefreshToken(payload: Payload, userId: number) {
+	generateRefreshToken(payload: Payload, tokenId: string) {
 		logger.info('Entering generateRefreshToken of TokenService');
+		logger.info(
+			`Generating refresh token for userId: ${payload.userId}, role: ${payload.role}, tokenId: ${tokenId}`
+		);
 		const tokenPayload: JwtPayload = {
+			id: tokenId,
 			sub: payload.userId,
 			role: payload.role,
 		};
@@ -51,7 +55,7 @@ export class TokenService {
 			algorithm: 'HS256',
 			expiresIn: '30 days',
 			issuer: 'auth-service',
-			jwtid: userId.toString(),
+			jwtid: tokenId.toString(),
 		});
 
 		return refreshToken;
@@ -61,8 +65,12 @@ export class TokenService {
 		const MS_IN_YEAR = 1000 * 60 * 60 * 24 * 365; // TODO : 366 if leap year
 		const newRefreshToken = await this.refreshTokenRepo.save({
 			user: user,
-			expiresAt: new Date(Date() + MS_IN_YEAR),
+			expiresAt: new Date(Date.now() + MS_IN_YEAR),
 		});
 		return newRefreshToken;
+	}
+
+	async deleteRefreshToken(tokenId: string) {
+		return await this.refreshTokenRepo.delete(tokenId);
 	}
 }

@@ -67,7 +67,7 @@ export class UserService {
 			throw error;
 		}
 	}
-
+	// remove the ERROR from the service functions
 	async findById(id: number) {
 		logger.info('Entering into getUserByEmail of UserService');
 		try {

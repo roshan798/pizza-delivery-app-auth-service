@@ -21,7 +21,17 @@ export interface LoginUserRequest extends Request {
 
 export interface AuthRequest extends Request {
 	auth: {
+		id?: string;
 		sub: string;
 		role: string;
+		iat?: number;
+		exp?: number;
+		iss?: string;
+		jti?: string;
 	};
 }
+
+export type AuthCookie = {
+	accessToken: string;
+	refreshToken: string;
+};

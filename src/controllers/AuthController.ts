@@ -48,7 +48,7 @@ export class AuthController {
 				await this.tokenService.persistRefreshToken(savedUser);
 			const refreshToken = this.tokenService.generateRefreshToken(
 				payload,
-				newRefreshToken.user.id
+				newRefreshToken.id
 			);
 
 			res.cookie('accessToken', accessToken, {
@@ -123,7 +123,7 @@ export class AuthController {
 				await this.tokenService.persistRefreshToken(savedUser);
 			const refreshToken = this.tokenService.generateRefreshToken(
 				payload,
-				newRefreshToken.user.id
+				newRefreshToken.id
 			);
 
 			res.cookie('accessToken', accessToken, {
@@ -172,6 +172,51 @@ export class AuthController {
 				500,
 				'Something bad happend : ' + (err as Error).message
 			);
+			next(error);
+		}
+	}
+
+	async refresh(req: AuthRequest, res: Response, next: NextFunction) {
+		logger.info('Refresh endpoint hit');
+
+		try {
+			const { sub: userId, role, jti: tokenId } = req.auth;
+			logger.debug(
+				`User ID: ${userId}, Role: ${role}, Token ID: ${tokenId}`
+			);
+			const user = await this.userService.findById(Number(userId));
+			const payload: Payload = {
+				userId: user.id.toString(),
+				role: user.role,
+			};
+			const accessToken = this.tokenService.generateAccessToken(payload);
+			await this.tokenService.deleteRefreshToken(tokenId!);
+			const newRefreshToken =
+				await this.tokenService.persistRefreshToken(user);
+			// remove the old One
+			const refreshToken = this.tokenService.generateRefreshToken(
+				payload,
+				newRefreshToken.id
+			);
+
+			res.cookie('accessToken', accessToken, {
+				httpOnly: true,
+				maxAge: 60 * 60 * 1000, // 60 minutes
+				domain: 'localhost',
+				sameSite: 'strict',
+			});
+			res.cookie('refreshToken', refreshToken, {
+				httpOnly: true,
+				maxAge: 30 * 24 * 60 * 60 * 1000,
+				domain: 'localhost',
+				sameSite: 'strict',
+			});
+
+			return res.json({
+				success: true,
+				msg: 'Tokens refreshed successfully!',
+			});
+		} catch (error) {
 			next(error);
 		}
 	}

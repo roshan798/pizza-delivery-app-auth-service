@@ -3,6 +3,7 @@ import jwksClient from 'jwks-rsa';
 import { Config } from '../confiig';
 import { Request } from 'express';
 import logger from '../confiig/logger';
+import { AuthCookie } from '../types';
 
 export default expressjwt({
 	secret: jwksClient.expressJwtSecret({
@@ -18,7 +19,7 @@ export default expressjwt({
 			logger.debug(`📡 Token from header: ${token}`);
 			return token;
 		}
-		const { accessToken: token } = req.cookies as { accessToken: string };
+		const { accessToken: token } = req.cookies as AuthCookie;
 		logger.debug(`🍪 Token from cookie: ${token}`);
 		return token;
 	},
