@@ -20,23 +20,24 @@ export class AuthController {
 		private tokenService: TokenService,
 		private credentialService: CredentialService
 	) {}
+
 	async register(
 		req: RegisterUserRequest,
 		res: Response,
 		next: NextFunction
 	) {
-		logger.info('Register endpoint hit');
-		// Validate request body
+		logger.info('[REGISTER] Request received');
+
 		const validationErrors = validationResult(req);
 		if (!validationErrors.isEmpty()) {
-			logger.error(
-				`Validation errors: ${JSON.stringify(validationErrors.array())}`
-			);
+			logger.warn('[REGISTER] Input validation failed');
 			return res.status(400).json({
-				message: 'Validation failed',
+				success: false,
+				message: 'Invalid input data',
 				errors: validationErrors.array(),
 			});
 		}
+
 		try {
 			const { firstName, lastName, email, password } = req.body;
 			const savedUser = await this.userService.create({
@@ -50,116 +51,64 @@ export class AuthController {
 				userId: savedUser.id.toString(),
 				role: savedUser.role,
 			};
-			const accessToken = this.tokenService.generateAccessToken(payload);
-			const newRefreshToken =
-				await this.tokenService.persistRefreshToken(savedUser);
-			const refreshToken = this.tokenService.generateRefreshToken(
-				payload,
-				newRefreshToken.id
-			);
 
-			res.cookie('accessToken', accessToken, {
-				httpOnly: true,
-				maxAge: 60 * 60 * 1000, // 60 minutes
-				domain: 'localhost',
-				sameSite: 'strict',
-			});
-			res.cookie('refreshToken', refreshToken, {
-				httpOnly: true,
-				maxAge: 30 * 24 * 60 * 60 * 1000,
-				domain: 'localhost',
-				sameSite: 'strict',
-			});
+			this.tokenService.addAccessToken(res, payload);
+			await this.tokenService.addRefreshToken(res, payload, savedUser);
 
-			const responseData = {
-				userId: savedUser.id,
-				firstName: savedUser.firstName,
-				lastName: savedUser.lastName,
-				email: savedUser.email,
-			};
-			logger.info(
-				`User registered successfully: ${JSON.stringify(responseData)}`
-			);
-
-			res.status(201).json({
-				message: 'User registered successfully',
+			logger.info(`[REGISTER] User created with ID: ${savedUser.id}`);
+			return res.status(201).json({
 				success: true,
-				id: responseData.userId,
+				message: 'Registration successful',
+				id: savedUser.id,
 			});
-		} catch (err) {
-			next(err);
+		} catch (error) {
+			logger.error('[REGISTER] Internal server error');
+			if (Config.NODE_ENV !== 'production') logger.debug(error);
+			next(createHttpError(500, 'An error occurred during registration'));
 		}
 	}
 
 	async login(req: LoginUserRequest, res: Response, next: NextFunction) {
-		logger.info('Login endpoint hit');
-		// Validate request body
+		logger.info('[LOGIN] Request received');
+
 		const validationErrors = validationResult(req);
 		if (!validationErrors.isEmpty()) {
-			logger.error(
-				`Validation errors: ${JSON.stringify(validationErrors.array())}`
-			);
+			logger.warn('[LOGIN] Input validation failed');
 			return res.status(400).json({
-				message: 'Validation failed',
+				success: false,
+				message: 'Invalid input data',
 				errors: validationErrors.array(),
 			});
 		}
+
 		try {
 			const { email, password } = req.body;
-			logger.debug('request body', {
-				email,
-				password: '*******',
-			});
+			logger.debug('[LOGIN] Checking credentials');
 
 			const savedUser = await this.userService.getUserByEmail(email);
-			const match = await this.credentialService.comparePassword(
+			const isMatch = await this.credentialService.comparePassword(
 				password,
 				savedUser.password
 			);
-			if (!match) {
-				next(createHttpError(401, 'Email or Password does not match!'));
-				return;
+
+			if (!isMatch) {
+				logger.warn('[LOGIN] Invalid email or password');
+				throw createHttpError(401, 'Invalid credentials');
 			}
 
 			const payload: Payload = {
 				userId: savedUser.id.toString(),
 				role: savedUser.role,
 			};
-			const accessToken = this.tokenService.generateAccessToken(payload);
-			const newRefreshToken =
-				await this.tokenService.persistRefreshToken(savedUser);
-			const refreshToken = this.tokenService.generateRefreshToken(
-				payload,
-				newRefreshToken.id
-			);
 
-			res.cookie('accessToken', accessToken, {
-				httpOnly: true,
-				maxAge: 60 * 60 * 1000, // 60 minutes
-				domain: 'localhost',
-				sameSite: 'strict',
-			});
-			res.cookie('refreshToken', refreshToken, {
-				httpOnly: true,
-				maxAge: 30 * 24 * 60 * 60 * 1000,
-				domain: 'localhost',
-				sameSite: 'strict',
-			});
+			this.tokenService.addAccessToken(res, payload);
+			await this.tokenService.addRefreshToken(res, payload, savedUser);
 
-			const responseData = {
-				userId: savedUser.id,
-				firstName: savedUser.firstName,
-				lastName: savedUser.lastName,
-				email: savedUser.email,
-			};
-			logger.info(
-				`User logged in successfully: ${JSON.stringify(responseData)}`
-			);
-
-			res.status(200).json({
-				message: 'Login successful',
+			logger.info(`[LOGIN] Authenticated user ID: ${savedUser.id}`);
+			return res.status(200).json({
 				success: true,
-				id: responseData.userId,
+				message: 'Login successful',
+				id: savedUser.id,
 			});
 		} catch (err) {
 			next(err);
@@ -167,73 +116,60 @@ export class AuthController {
 	}
 
 	async self(req: AuthRequest, res: Response, next: NextFunction) {
+		logger.info('[SELF] Request received');
 		try {
 			const { sub: userId } = req.auth;
 			const user = await this.userService.findById(Number(userId));
-			res.json({
-				success: true,
-				user: { ...user, password: undefined },
-			});
-		} catch (err: unknown) {
-			const error = createHttpError(
-				500,
-				'Something bad happend : ' + (err as Error).message
-			);
-			next(error);
+
+			logger.info(`[SELF] Retrieved data for user ID: ${userId}`);
+			res.json({ success: true, user: { ...user, password: undefined } });
+		} catch (error) {
+			logger.error('[SELF] Failed to fetch user info');
+			if (Config.NODE_ENV !== 'production') logger.debug(error);
+			next(createHttpError(500, 'Could not retrieve user information'));
 		}
 	}
 
 	async refresh(req: AuthRequest, res: Response, next: NextFunction) {
-		logger.info('Refresh endpoint hit');
-
+		logger.info('[REFRESH] Request received');
 		try {
-			const { sub: userId, role, jti: tokenId } = req.auth;
-			logger.debug(
-				`User ID: ${userId}, Role: ${role}, Token ID: ${tokenId}`
-			);
+			const { sub: userId, jti: tokenId } = req.auth;
+			logger.debug(`[REFRESH] Verifying token for user ID: ${userId}`);
+
 			const user = await this.userService.findById(Number(userId));
 			const payload: Payload = {
 				userId: user.id.toString(),
 				role: user.role,
 			};
-			const accessToken = this.tokenService.generateAccessToken(payload);
-			await this.tokenService.deleteRefreshToken(tokenId!);
-			const newRefreshToken =
-				await this.tokenService.persistRefreshToken(user);
-			// remove the old One
-			const refreshToken = this.tokenService.generateRefreshToken(
+
+			this.tokenService.addAccessToken(res, payload);
+			await this.tokenService.addRefreshToken(
+				res,
 				payload,
-				newRefreshToken.id
+				user,
+				tokenId
 			);
 
-			res.cookie('accessToken', accessToken, {
-				httpOnly: true,
-				maxAge: 60 * 60 * 1000, // 60 minutes
-				domain: 'localhost',
-				sameSite: 'strict',
-			});
-			res.cookie('refreshToken', refreshToken, {
-				httpOnly: true,
-				maxAge: 30 * 24 * 60 * 60 * 1000,
-				domain: 'localhost',
-				sameSite: 'strict',
-			});
-
-			return res.json({
+			logger.info(`[REFRESH] Tokens refreshed for user ID: ${userId}`);
+			return res.status(200).json({
 				success: true,
-				msg: 'Tokens refreshed successfully!',
+				message: 'Tokens refreshed successfully',
 			});
 		} catch (error) {
-			next(error);
+			logger.error('[REFRESH] Failed to refresh tokens');
+			if (Config.NODE_ENV !== 'production') logger.debug(error);
+			next(createHttpError(500, 'Token refresh failed'));
 		}
 	}
 
 	async logout(req: AuthRequest, res: Response, next: NextFunction) {
+		logger.info('[LOGOUT] Request received');
 		try {
 			const { refreshToken } = req.cookies as AuthCookie;
 
 			if (!refreshToken) {
-				throw createHttpError(401, 'Refresh token missing.');
+				logger.warn('[LOGOUT] No refresh token present');
+				throw createHttpError(401, 'Invalid session');
 			}
 
 			let decoded;
@@ -241,28 +177,30 @@ export class AuthController {
 				decoded = jwt.verify(refreshToken, Config.JWT_SECRET!) as {
 					jti: string;
 				};
-				// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			} catch (err) {
-				throw createHttpError(401, 'Invalid refresh token.');
+			} catch {
+				logger.warn('[LOGOUT] Refresh token verification failed');
+				throw createHttpError(401, 'Invalid session');
 			}
 
 			const refreshTokenId = decoded.jti;
 			if (!refreshTokenId) {
-				logger.warn('Refresh token does not contain jti.');
-				throw createHttpError(401, 'Invalid token.');
+				logger.warn('[LOGOUT] Missing token ID');
+				throw createHttpError(401, 'Invalid session');
 			}
 
 			await this.tokenService.deleteRefreshToken(refreshTokenId);
-
 			res.clearCookie('accessToken');
 			res.clearCookie('refreshToken');
 
+			logger.info('[LOGOUT] Session ended successfully');
 			return res.status(200).json({
 				success: true,
-				msg: 'Logged out successfully!',
+				message: 'Logged out successfully',
 			});
 		} catch (error) {
-			next(error);
+			logger.error('[LOGOUT] Failed to logout');
+			if (Config.NODE_ENV !== 'production') logger.debug(error);
+			next(createHttpError(500, 'Logout failed'));
 		}
 	}
 }

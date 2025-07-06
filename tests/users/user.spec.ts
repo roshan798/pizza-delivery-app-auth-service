@@ -116,5 +116,31 @@ describe('GET auth/self', () => {
 
 			expect(res.status).toBe(401);
 		});
+		describe('Security & Edge Cases', () => {
+			it('should return 401 for tampered JWT', async () => {
+				const userRepo = AppDataSource.getRepository(User);
+				const savedUser = await userRepo.save({
+					firstName: 'Tampered',
+					lastName: 'JWT',
+					email: 'tamperedjwt@test.com',
+					password: 'password123',
+					role: 'customer',
+				});
+				const accessToken =
+					'tampered.' +
+					Buffer.from(
+						JSON.stringify({
+							sub: savedUser.id,
+							role: savedUser.role,
+						})
+					)
+						.toString('base64')
+						.concat('.signature');
+				const res = await request(app)
+					.get('/auth/self')
+					.set('Cookie', [`accessToken=${accessToken};`]);
+				expect([401, 400]).toContain(res.status);
+			});
+		});
 	});
 });

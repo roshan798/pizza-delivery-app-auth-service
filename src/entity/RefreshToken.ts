@@ -13,7 +13,7 @@ export class RefreshToken {
 	@PrimaryGeneratedColumn()
 	id: string;
 
-	@ManyToOne(() => User)
+	@ManyToOne(() => User, { onDelete: 'CASCADE' })
 	user: User;
 
 	@Column({ type: 'timestamp' })

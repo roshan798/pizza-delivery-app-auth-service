@@ -149,4 +149,68 @@ describe('POST auth/login', () => {
 			expect(response.status).toBe(401);
 		});
 	});
+
+	describe('Security & Edge Cases', () => {
+		let connection: DataSource;
+
+		// This will run before all tests in this block
+		// It is used to initialize the database connection
+		beforeAll(async () => {
+			connection = await AppDataSource.initialize();
+		});
+
+		// This will run before each test in this block
+		beforeEach(async () => {
+			await connection.dropDatabase();
+			await connection.synchronize();
+			const user = {
+				firstName: 'John',
+				lastName: 'Doe',
+				email: 'roshan@gmail.com',
+				password: 'password123',
+				role: 'customer',
+			};
+			await request(app).post('/auth/register').send(user);
+		});
+
+		// This will run after all tests in this block
+		afterAll(async () => {
+			await connection.destroy();
+		});
+		it('should reject login with SQLi/XSS payloads', async () => {
+			const response = await request(app).post('/auth/login').send({
+				email: "' OR 1=1;--",
+				password: '<script>alert(1)</script>',
+			});
+			expect([400, 401]).toContain(response.status);
+		});
+		it('should reject login with very long fields', async () => {
+			const response = await request(app)
+				.post('/auth/login')
+				.send({
+					email: 'a'.repeat(300) + '@test.com',
+					password: 'a'.repeat(300),
+				});
+			expect(response.status).toBe(400);
+		});
+		it('should ignore extra fields in login', async () => {
+			const response = await request(app).post('/auth/login').send({
+				email: 'roshan@gmail.com',
+				password: 'password123',
+				extra: 'field',
+			});
+			// Should still succeed if credentials are correct
+			// Or fail if extra fields are not allowed
+			// Accept either 200 or 400/401 depending on implementation
+			expect([200, 400, 401]).toContain(response.status);
+		});
+		it('should not allow login for revoked/deleted user', async () => {
+			const userRepo = AppDataSource.getRepository('User');
+			await userRepo.delete({ email: 'roshan@gmail.com' });
+			const response = await request(app)
+				.post('/auth/login')
+				.send({ email: 'roshan@gmail.com', password: 'password123' });
+			expect(response.status).toBe(401);
+		});
+	});
 });

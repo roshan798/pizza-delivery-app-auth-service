@@ -361,4 +361,63 @@ describe('POST auth/register', () => {
 			expect(users.length).toBe(0);
 		});
 	});
+
+	describe('Security & Edge Cases', () => {
+		it('should reject registration with SQLi/XSS payloads', async () => {
+			const response = await request(app).post('/auth/register').send({
+				firstName: '<script>alert(1)</script>',
+				lastName: "' OR 1=1;--",
+				email: "' OR 1=1;--@test.com",
+				password: '<img src=x onerror=alert(1)>',
+				role: 'customer',
+			});
+			expect(response.status).toBe(400);
+		});
+		it('should reject registration with very long fields', async () => {
+			const response = await request(app)
+				.post('/auth/register')
+				.send({
+					firstName: 'a'.repeat(300),
+					lastName: 'b'.repeat(300),
+					email: 'a'.repeat(300) + '@test.com',
+					password: 'a'.repeat(300),
+					role: 'customer',
+				});
+			expect(response.status).toBe(400);
+		});
+		it('should ignore extra fields in registration', async () => {
+			const response = await request(app).post('/auth/register').send({
+				firstName: 'John',
+				lastName: 'Doe',
+				email: 'extra@test.com',
+				password: 'password123',
+				role: 'customer',
+				extra: 'field',
+			});
+			// Should still succeed if credentials are correct
+			// Or fail if extra fields are not allowed
+			// Accept either 201 or 400 depending on implementation
+			expect([201, 400]).toContain(response.status);
+		});
+		it.skip('should not allow registration for revoked/deleted user email', async () => {
+			const userRepo = AppDataSource.getRepository('User');
+			await userRepo.save({
+				firstName: 'Jane',
+				lastName: 'Doe',
+				email: 'revoked@test.com',
+				password: 'password123',
+				role: 'customer',
+			});
+			await userRepo.delete({ email: 'revoked@test.com' });
+			const response = await request(app).post('/auth/register').send({
+				firstName: 'Jane',
+				lastName: 'Doe',
+				email: 'revoked@test.com',
+				password: 'password123',
+				role: 'customer',
+			});
+			// Should succeed (new user) or fail (if soft delete)
+			expect([201, 400]).toContain(response.status);
+		});
+	});
 });

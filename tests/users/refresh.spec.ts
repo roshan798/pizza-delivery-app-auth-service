@@ -93,4 +93,87 @@ describe('POST /auth/refresh', () => {
 		});
 		expect(old).toBeNull();
 	});
+
+	describe('Security & Edge Cases', () => {
+		it('should reject refresh with tampered JWT', async () => {
+			const userRepo = AppDataSource.getRepository(User);
+			const savedUser = await userRepo.save({
+				firstName: 'Test',
+				lastName: 'User',
+				email: 'tampered@test.com',
+				password: 'password123',
+				role: 'customer',
+			});
+			const refreshToken = jwt.sign(
+				{ id: '999', sub: savedUser.id, role: savedUser.role },
+				'wrongsecret',
+				{ expiresIn: '1h' }
+			);
+			const res = await request(app)
+				.post('/auth/refresh')
+				.set('Cookie', [`refreshToken=${refreshToken}; HttpOnly`]);
+			expect([401, 400]).toContain(res.status);
+		});
+		it('should reject refresh with reused refresh token', async () => {
+			const userRepo = AppDataSource.getRepository(User);
+			const refreshTokenRepo = AppDataSource.getRepository(RefreshToken);
+			const savedUser = await userRepo.save({
+				firstName: 'Test',
+				lastName: 'User',
+				email: 'reuse@test.com',
+				password: 'password123',
+				role: 'customer',
+			});
+			const savedToken = await refreshTokenRepo.save({
+				user: savedUser,
+				expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+			});
+			const refreshToken = jwt.sign(
+				{
+					id: savedToken.id,
+					sub: savedUser.id.toString(),
+					role: savedUser.role,
+				},
+				Config.JWT_SECRET!,
+				{
+					algorithm: 'HS256',
+					expiresIn: '1h',
+					issuer: 'auth-service',
+					jwtid: savedToken.id.toString(),
+				}
+			);
+			// First use
+			await request(app)
+				.post('/auth/refresh')
+				.set('Cookie', [`refreshToken=${refreshToken}; HttpOnly`]);
+			// Second use (should fail)
+			const res = await request(app)
+				.post('/auth/refresh')
+				.set('Cookie', [`refreshToken=${refreshToken}; HttpOnly`]);
+			expect([401, 400]).toContain(res.status);
+		});
+		it('should reject refresh with expired refresh token', async () => {
+			const userRepo = AppDataSource.getRepository(User);
+			const savedUser = await userRepo.save({
+				firstName: 'Test',
+				lastName: 'User',
+				email: 'expired@test.com',
+				password: 'password123',
+				role: 'customer',
+			});
+			const expiredToken = jwt.sign(
+				{ id: 'expired', sub: savedUser.id, role: savedUser.role },
+				Config.JWT_SECRET!,
+				{ expiresIn: -10 }
+			);
+			const res = await request(app)
+				.post('/auth/refresh')
+				.set('Cookie', [`refreshToken=${expiredToken}; HttpOnly`]);
+			expect([401, 400]).toContain(res.status);
+		});
+		it('should return 401 if no cookies are sent', async () => {
+			const res = await request(app).post('/auth/refresh');
+			expect(res.status).toBe(401);
+		});
+	});
 });
