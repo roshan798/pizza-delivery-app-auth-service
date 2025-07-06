@@ -1,11 +1,18 @@
 import { NextFunction, Response } from 'express';
 import logger from '../confiig/logger';
-import { AuthRequest, LoginUserRequest, RegisterUserRequest } from '../types';
+import {
+	AuthCookie,
+	AuthRequest,
+	LoginUserRequest,
+	RegisterUserRequest,
+} from '../types';
 import { UserService } from '../services/UserService';
 import { Payload, TokenService } from '../services/TokenService';
 import { CredentialService } from '../services/CredentialService';
 import { validationResult } from 'express-validator';
 import createHttpError from 'http-errors';
+import jwt from 'jsonwebtoken';
+import { Config } from '../confiig';
 
 export class AuthController {
 	constructor(
@@ -215,6 +222,44 @@ export class AuthController {
 			return res.json({
 				success: true,
 				msg: 'Tokens refreshed successfully!',
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	async logout(req: AuthRequest, res: Response, next: NextFunction) {
+		try {
+			const { refreshToken } = req.cookies as AuthCookie;
+
+			if (!refreshToken) {
+				throw createHttpError(401, 'Refresh token missing.');
+			}
+
+			let decoded;
+			try {
+				decoded = jwt.verify(refreshToken, Config.JWT_SECRET!) as {
+					jti: string;
+				};
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			} catch (err) {
+				throw createHttpError(401, 'Invalid refresh token.');
+			}
+
+			const refreshTokenId = decoded.jti;
+			if (!refreshTokenId) {
+				logger.warn('Refresh token does not contain jti.');
+				throw createHttpError(401, 'Invalid token.');
+			}
+
+			await this.tokenService.deleteRefreshToken(refreshTokenId);
+
+			res.clearCookie('accessToken');
+			res.clearCookie('refreshToken');
+
+			return res.status(200).json({
+				success: true,
+				msg: 'Logged out successfully!',
 			});
 		} catch (error) {
 			next(error);

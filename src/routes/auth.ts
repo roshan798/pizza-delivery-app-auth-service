@@ -74,4 +74,16 @@ router.post(
 	}
 );
 
+router.post(
+	'/logout',
+	authenticate,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			await authController.logout(req as AuthRequest, res, next);
+		} catch (err) {
+			next(err);
+		}
+	}
+);
+
 export default router;
