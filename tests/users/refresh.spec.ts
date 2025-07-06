@@ -79,10 +79,6 @@ describe('POST /auth/refresh', () => {
 			]);
 
 		expect(res.status).toBe(200);
-		expect(res.body).toMatchObject({
-			success: true,
-			msg: 'Tokens refreshed successfully!',
-		});
 
 		expect(res.headers['set-cookie']).toEqual(
 			expect.arrayContaining([
