@@ -1,7 +1,7 @@
 import app from './app';
-import { Config } from './confiig';
-import { AppDataSource } from './confiig/data-source';
-import logger from './confiig/logger';
+import { Config } from './config';
+import { AppDataSource } from './config/data-source';
+import logger from './config/logger';
 
 const startServer = async () => {
 	const url = Config.URL;

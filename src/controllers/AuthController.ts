@@ -1,5 +1,5 @@
 import { NextFunction, Response } from 'express';
-import logger from '../confiig/logger';
+import logger from '../config/logger';
 import {
 	AuthCookie,
 	AuthRequest,
@@ -12,7 +12,7 @@ import { CredentialService } from '../services/CredentialService';
 import { validationResult } from 'express-validator';
 import createHttpError from 'http-errors';
 import jwt from 'jsonwebtoken';
-import { Config } from '../confiig';
+import { Config } from '../config';
 
 export class AuthController {
 	constructor(

@@ -1,9 +1,9 @@
 import { expressjwt } from 'express-jwt';
-import { Config } from '../confiig';
+import { Config } from '../config';
 import { Request } from 'express';
-import logger from '../confiig/logger';
+import logger from '../config/logger';
 import { AuthCookie } from '../types';
-import { AppDataSource } from '../confiig/data-source';
+import { AppDataSource } from '../config/data-source';
 import { RefreshToken } from '../entity/RefreshToken';
 import { Jwt } from 'jsonwebtoken';
 

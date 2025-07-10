@@ -1,7 +1,7 @@
 import request from 'supertest';
 import app from '../../src/app';
 import { DataSource } from 'typeorm';
-import { AppDataSource } from '../../src/confiig/data-source';
+import { AppDataSource } from '../../src/config/data-source';
 import { RefreshToken } from '../../src/entity/RefreshToken';
 import { isValidCookieFormat } from '../utils';
 describe('POST auth/register', () => {

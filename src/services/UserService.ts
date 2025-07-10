@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { User } from '../entity/User';
 import { User as UserType, UserData } from '../types';
-import logger from '../confiig/logger';
+import logger from '../config/logger';
 import createHttpError from 'http-errors';
 import { Roles } from '../constants';
 import { HashService } from './HashService';

@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import path from 'node:path';
 import express, { NextFunction, Request, Response } from 'express';
-import logger from './confiig/logger';
+import logger from './config/logger';
 import { HttpError } from 'http-errors';
 import authRouter from './routes/auth';
 import cookieParser from 'cookie-parser';

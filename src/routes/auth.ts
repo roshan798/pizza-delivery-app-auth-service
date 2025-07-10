@@ -1,7 +1,7 @@
 import express, { Response, Request, NextFunction } from 'express';
 import { AuthController } from '../controllers/AuthController';
 import { UserService } from '../services/UserService';
-import { AppDataSource } from '../confiig/data-source';
+import { AppDataSource } from '../config/data-source';
 import { User } from '../entity/User';
 import { HashService } from '../services/HashService';
 import registerValidator from '../validators/register-validators';

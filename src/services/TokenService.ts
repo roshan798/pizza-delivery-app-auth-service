@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { JwtPayload, sign } from 'jsonwebtoken';
-import logger from '../confiig/logger';
+import logger from '../config/logger';
 import createHttpError from 'http-errors';
-import { Config } from '../confiig';
+import { Config } from '../config';
 import { Repository } from 'typeorm';
 import { RefreshToken } from '../entity/RefreshToken';
 import { User as UserType } from '../types/index';

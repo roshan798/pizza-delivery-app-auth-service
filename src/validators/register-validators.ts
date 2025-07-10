@@ -1,7 +1,7 @@
 import { checkSchema } from 'express-validator';
-import { AppDataSource } from '../confiig/data-source';
+import { AppDataSource } from '../config/data-source';
 import { User } from '../entity/User';
-import logger from '../confiig/logger';
+import logger from '../config/logger';
 
 export default checkSchema({
 	email: {

@@ -1,7 +1,7 @@
 import request from 'supertest';
 import app from '../../src/app';
 import { createJWKSMock, JWKSMock } from 'mock-jwks';
-import { AppDataSource } from '../../src/confiig/data-source';
+import { AppDataSource } from '../../src/config/data-source';
 import { DataSource } from 'typeorm';
 import { User } from '../../src/entity/User';
 describe('GET auth/self', () => {
