@@ -19,7 +19,7 @@ export const Config = {
 	PORT,
 	HOST,
 	URL: `http://${HOST}:${PORT}`,
-	NODE_ENV: process.env.NODE_ENV,
+	NODE_ENV: process.env.NODE_ENV || 'dev',
 	DB_HOST,
 	DB_PORT,
 	DB_USERNAME,
