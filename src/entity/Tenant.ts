@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 
 @Entity({ name: 'tenants' })
-export class Tenents {
+export class Tenent {
 	@PrimaryGeneratedColumn()
 	id: string;
 
