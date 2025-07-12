@@ -14,6 +14,8 @@
 		"lint:fix": "eslint . --fix",
 		"prepare": "husky install",
 		"migration:generate": "cross-env NODE_ENV=dev typeorm-ts-node-commonjs migration:generate -d ./src/config/data-source.ts",
+		"migration:run":"cross-env NODE_ENV=dev typeorm-ts-node-commonjs migration:run -d ./src/config/data-source.ts",
+		"migration:new":"cross-env NODE_ENV=dev typeorm-ts-node-commonjs migration:create -d ./src/config/data-source.ts",
 		"start:DB": "docker run --rm --name mernpg-container -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -v mernpgdata:/var/lib/postgresql/data -p 5432:5432 -d postgres",
 		"stop:DB": "docker stop mernpg-container",
 		"generateKeys": "node ./scripts/generatePrivateKey.mjs"
