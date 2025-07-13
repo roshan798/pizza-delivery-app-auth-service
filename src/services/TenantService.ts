@@ -23,4 +23,9 @@ export class TenantService {
 			},
 		});
 	}
+
+	async updateTenantById(id: string, body: Partial<Tenant>) {
+		logger.info(`[SERVICE] updateTenantById}`);
+		return await this.tenantRepo.save(body);
+	}
 }

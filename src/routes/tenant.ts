@@ -3,7 +3,11 @@ import { TenantController } from '../controllers/TenantController';
 import { TenantService } from '../services/TenantService';
 import { Tenant } from '../entity/Tenant';
 import { AppDataSource } from '../config/data-source';
-import tenantCreateValidators from '../validators/tenant-create-validators';
+import {
+	createTenantValidator,
+	idParamValidator,
+	updateTenantValidator,
+} from '../validators/tenant-create-validators';
 import authenticate from '../middlewares/authenticate';
 import canAccess from '../middlewares/canAccess';
 import { Roles } from '../constants';
@@ -18,7 +22,7 @@ router.post(
 	'/',
 	authenticate,
 	canAccess([Roles.ADMIN]),
-	tenantCreateValidators,
+	createTenantValidator,
 	async (req: Request, res: Response, next: NextFunction) => {
 		await tenantController.createTenant(req, res, next);
 	}
@@ -37,8 +41,20 @@ router.get(
 	'/:id',
 	authenticate,
 	canAccess([Roles.ADMIN]),
+	idParamValidator,
 	async (req: Request, res: Response, next: NextFunction) => {
 		await tenantController.getTenantById(req, res, next);
+	}
+);
+
+router.put(
+	'/:id',
+	authenticate,
+	canAccess([Roles.ADMIN]),
+	idParamValidator,
+	updateTenantValidator,
+	async (req: Request, res: Response, next: NextFunction) => {
+		await tenantController.updateTenantById(req, res, next);
 	}
 );
 

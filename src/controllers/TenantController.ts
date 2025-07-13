@@ -56,22 +56,20 @@ export class TenantController {
 	}
 
 	async getTenantById(req: Request, res: Response, next: NextFunction) {
-		logger.info('[GET] By Tenant ID  Request received');
+		logger.info('[GET] Request received');
+
+		const validationErrors = validationResult(req);
+		if (!validationErrors.isEmpty()) {
+			logger.warn('[GET] Input validation failed');
+			return res.status(400).json({
+				success: false,
+				message: 'Invalid input data',
+				errors: validationErrors.array(),
+			});
+		}
 		try {
 			const id: string = req.params.id;
-			const numericId = Number(id);
-			if (!id || id.trim() === '') {
-				return res.status(400).json({
-					success: false,
-					message: 'Invalid tenant ID!',
-				});
-			}
-			if (!Number.isInteger(numericId) || numericId <= 0) {
-				return res.status(400).json({
-					success: false,
-					message: 'Tenant ID must be a valid positive integer',
-				});
-			}
+			logger.info(`[GET] By Tenant ID  Request received : ${id}`);
 			const tenant = await this.tenantService.getTenantById(id);
 			if (!tenant) {
 				return res.status(404).json({
@@ -85,6 +83,64 @@ export class TenantController {
 			});
 		} catch (error) {
 			next(error);
+		}
+	}
+
+	async updateTenantById(
+		req: TenantCreateRequest,
+		res: Response,
+		next: NextFunction
+	) {
+		logger.info('[UPDATE] Request received');
+
+		const validationErrors = validationResult(req);
+		if (!validationErrors.isEmpty()) {
+			logger.warn('[UPDATE] Input validation failed');
+			return res.status(400).json({
+				success: false,
+				message: 'Invalid input data',
+				errors: validationErrors.array(),
+			});
+		}
+
+		const { name, address } = req.body;
+		if (!name && !address) {
+			return res.status(400).json({
+				success: false,
+				message: 'At least one of name or address must be provided!',
+			});
+		}
+
+		try {
+			const id: string = req.params.id;
+
+			const existingTenant = await this.tenantService.getTenantById(id);
+			if (!existingTenant) {
+				return res.status(404).json({
+					success: false,
+					message: 'Tenant not found',
+				});
+			}
+			const tenantData = {
+				id: existingTenant.id,
+				name: name || existingTenant.name,
+				address: address || existingTenant.address,
+			};
+			const updatedTenant = await this.tenantService.updateTenantById(
+				id,
+				tenantData
+			);
+
+			res.status(200).json({
+				success: true,
+				tenant: updatedTenant,
+			});
+		} catch (err) {
+			logger.error('[UPDATE] Internal server error');
+			if (Config.NODE_ENV !== 'production') logger.debug(err);
+			next(
+				createHttpError(500, 'An error occurred during tenant update')
+			);
 		}
 	}
 }
