@@ -1,4 +1,5 @@
 import { Request } from 'express';
+import { Tenant } from '../entity/Tenant';
 export interface UserData {
 	firstName: string;
 	lastName: string;
@@ -35,3 +36,10 @@ export type AuthCookie = {
 	accessToken: string;
 	refreshToken: string;
 };
+
+// tenant types
+export interface TenantCreateRequest extends Request {
+	body: Partial<Tenant>;
+}
+
+// tenant types
