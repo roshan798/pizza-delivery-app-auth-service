@@ -60,10 +60,16 @@ export class TenantController {
 		try {
 			const id: string = req.params.id;
 			const numericId = Number(id);
-			if (!id || id.trim() === '' || isNaN(numericId)) {
+			if (!id || id.trim() === '') {
 				return res.status(400).json({
 					success: false,
 					message: 'Invalid tenant ID!',
+				});
+			}
+			if (!Number.isInteger(numericId) || numericId <= 0) {
+				return res.status(400).json({
+					success: false,
+					message: 'Tenant ID must be a valid positive integer',
 				});
 			}
 			const tenant = await this.tenantService.getTenantById(id);
