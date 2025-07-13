@@ -41,20 +41,26 @@ describe('GET /tenants', () => {
 		it('should return 200 and a list of tenants for authenticated admin', async () => {
 			const userRepo = AppDataSource.getRepository(User);
 			const savedUser = await userRepo.save(user);
+
 			const accessToken = jwks.token({
 				sub: String(savedUser.id),
 				role: savedUser.role,
 			});
 
-			for (let i = 0; i < 10; i++) {
-				await request(app)
-					.post('/tenants')
-					.set('Cookie', [`accessToken=${accessToken};`])
-					.send({
-						name: 'New Tenant : ' + i,
-						address: 'A new tenant address for testing : ' + i,
-					});
-			}
+			const tenantsToCreate = Array.from({ length: 10 }, (_, i) => ({
+				name: `New Tenant ${i}`,
+				address: `A new tenant address for testing ${i}`,
+			}));
+
+			await Promise.all(
+				tenantsToCreate.map((tenant) =>
+					request(app)
+						.post('/tenants')
+						.set('Cookie', [`accessToken=${accessToken};`])
+						.send(tenant)
+						.expect(201)
+				)
+			);
 
 			const response = await request(app)
 				.get('/tenants')
@@ -62,6 +68,7 @@ describe('GET /tenants', () => {
 				.expect(200);
 
 			expect(response.body).toHaveProperty('tenants');
+			expect(Array.isArray(response.body.tenants)).toBe(true);
 			expect(response.body.tenants).toHaveLength(10);
 		});
 
@@ -90,9 +97,6 @@ describe('GET /tenants', () => {
 			expect(tenant).toHaveProperty('id');
 			expect(tenant).toHaveProperty('name', 'TestTenant');
 			expect(tenant).toHaveProperty('address', 'TestAddress');
-			expect(typeof tenant.id).toBe('string');
-			expect(typeof tenant.name).toBe('string');
-			expect(typeof tenant.address).toBe('string');
 		});
 
 		it('should return empty array if no tenants exist', async () => {

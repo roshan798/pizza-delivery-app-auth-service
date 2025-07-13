@@ -1,4 +1,4 @@
-import { Response, NextFunction } from 'express';
+import { Response, NextFunction, Request } from 'express';
 import { TenantService } from '../services/TenantService';
 import logger from '../config/logger';
 import { validationResult } from 'express-validator';
@@ -39,6 +39,19 @@ export class TenantController {
 			next(
 				createHttpError(500, 'An error occurred during tenant creation')
 			);
+		}
+	}
+
+	async getTenants(req: Request, res: Response, next: NextFunction) {
+		logger.info('[GET] Request received');
+		try {
+			const tenants = await this.tenantService.getTenants();
+			res.json({
+				success: true,
+				tenants: tenants,
+			});
+		} catch (error) {
+			next(error);
 		}
 	}
 }
