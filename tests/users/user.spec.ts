@@ -100,7 +100,7 @@ describe('GET auth/self', () => {
 			expect(res.body.user).not.toHaveProperty('password');
 		});
 
-		it('should return 401 status code', async () => {
+		it('should return 401 status code if the access token is missing', async () => {
 			// register user
 			const user = {
 				firstName: 'John',

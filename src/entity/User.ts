@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Tenent } from './Tenant';
+import { Tenant } from './Tenant';
 
 @Entity({ name: 'users' })
 export class User {
@@ -16,6 +16,6 @@ export class User {
 	@Column()
 	role: string;
 
-	@ManyToOne(() => Tenent)
-	tenant: Tenent;
+	@ManyToOne(() => Tenant)
+	tenant: Tenant;
 }
