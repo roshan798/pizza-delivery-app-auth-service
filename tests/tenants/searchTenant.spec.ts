@@ -181,7 +181,7 @@ describe('GET /tenants/:id', () => {
 				.expect(403);
 		});
 
-		it('should return 400 if tenant ID incorrect', async () => {
+		it('should return 404 if tenant ID incorrect', async () => {
 			const userRepo = AppDataSource.getRepository(User);
 			const savedUser = await userRepo.save(user);
 			const accessToken = jwks.token({
@@ -190,7 +190,21 @@ describe('GET /tenants/:id', () => {
 			});
 
 			await request(app)
-				.get(`/tenants/12`)
+				.get(`/tenants/99999`)
+				.set('Cookie', [`accessToken=${accessToken};`])
+				.expect(404);
+		});
+
+		it('should return 400 if tenant ID is not a number', async () => {
+			const userRepo = AppDataSource.getRepository(User);
+			const savedUser = await userRepo.save(user);
+			const accessToken = jwks.token({
+				sub: String(savedUser.id),
+				role: savedUser.role,
+			});
+
+			await request(app)
+				.get(`/tenants/abc`)
 				.set('Cookie', [`accessToken=${accessToken};`])
 				.expect(400);
 		});

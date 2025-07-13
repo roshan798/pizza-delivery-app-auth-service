@@ -14,4 +14,13 @@ export class TenantService {
 		logger.info(`[SERVICE] getTenants}`);
 		return this.tenantRepo.find();
 	}
+
+	async getTenantById(tenantID: string) {
+		logger.info(`[SERVICE] getTenantByTenantID}`);
+		return this.tenantRepo.findOne({
+			where: {
+				id: tenantID,
+			},
+		});
+	}
 }

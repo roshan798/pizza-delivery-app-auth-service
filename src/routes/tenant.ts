@@ -33,4 +33,13 @@ router.get(
 	}
 );
 
+router.get(
+	'/:id',
+	authenticate,
+	canAccess([Roles.ADMIN]),
+	async (req: Request, res: Response, next: NextFunction) => {
+		await tenantController.getTenantById(req, res, next);
+	}
+);
+
 export default router;

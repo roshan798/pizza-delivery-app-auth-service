@@ -54,4 +54,31 @@ export class TenantController {
 			next(error);
 		}
 	}
+
+	async getTenantById(req: Request, res: Response, next: NextFunction) {
+		logger.info('[GET] By Tenant ID  Request received');
+		try {
+			const id: string = req.params.id;
+			const numericId = Number(id);
+			if (!id || id.trim() === '' || isNaN(numericId)) {
+				return res.status(400).json({
+					success: false,
+					message: 'Invalid tenant ID!',
+				});
+			}
+			const tenant = await this.tenantService.getTenantById(id);
+			if (!tenant) {
+				return res.status(404).json({
+					success: false,
+					message: 'Tenant not found',
+				});
+			}
+			res.json({
+				success: true,
+				tenant: tenant,
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
 }
