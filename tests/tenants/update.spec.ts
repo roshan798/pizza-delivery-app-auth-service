@@ -1,38 +1,10 @@
 import { DataSource } from 'typeorm';
 import { createJWKSMock, JWKSMock } from 'mock-jwks';
 import { AppDataSource } from '../../src/config/data-source';
-import { User } from '../../src/entity/User';
 import { Roles } from '../../src/constants';
 import request from 'supertest';
 import app from '../../src/app';
-
-// ─────────────────────────────
-// ✅ Utility Functions (DRY)
-// ─────────────────────────────
-const createUser = async (connection: DataSource, role: string) => {
-	const userRepo = connection.getRepository(User);
-	return await userRepo.save({
-		firstName: 'John',
-		lastName: 'Doe',
-		email: `${role.toLowerCase()}@example.com`,
-		password: 'password123',
-		role,
-	});
-};
-
-const createTenant = async (token: string) => {
-	const res = await request(app)
-		.post('/tenants')
-		.set('Cookie', [`accessToken=${token};`])
-		.send({
-			name: 'TestTenant',
-			address: 'TestAddress',
-		});
-	return res.body;
-};
-
-const generateAccessToken = (jwks: JWKSMock, user: User) =>
-	jwks.token({ sub: String(user.id), role: user.role });
+import { createTenant, createUser, generateAccessToken } from '../utils';
 
 describe('PUT /tenants/:id', () => {
 	describe('Happy Path: Given all valid fields', () => {
