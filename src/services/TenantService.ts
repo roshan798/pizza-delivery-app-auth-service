@@ -28,4 +28,11 @@ export class TenantService {
 		logger.info(`[SERVICE] updateTenantById}`);
 		return await this.tenantRepo.save(body);
 	}
+
+	async deleteTenantById(id: string) {
+		logger.info(`[SERVICE] deleteTenantById}`);
+		return await this.tenantRepo.delete({
+			id,
+		});
+	}
 }

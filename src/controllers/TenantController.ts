@@ -143,4 +143,45 @@ export class TenantController {
 			);
 		}
 	}
+
+	async deleteTenantById(
+		req: TenantCreateRequest,
+		res: Response,
+		next: NextFunction
+	) {
+		logger.info('[DELETE] Request received');
+
+		const validationErrors = validationResult(req);
+		if (!validationErrors.isEmpty()) {
+			logger.warn('[DELETE] Input validation failed');
+			return res.status(400).json({
+				success: false,
+				message: 'Invalid input data',
+				errors: validationErrors.array(),
+			});
+		}
+
+		try {
+			const id: string = req.params.id;
+
+			const existingTenant = await this.tenantService.getTenantById(id);
+			if (!existingTenant) {
+				return res.status(404).json({
+					success: false,
+					message: 'Tenant not found',
+				});
+			}
+
+			await this.tenantService.deleteTenantById(id);
+			res.status(204).json({
+				success: true,
+			});
+		} catch (err) {
+			logger.error('[DELETE] Internal server error');
+			if (Config.NODE_ENV !== 'production') logger.debug(err);
+			next(
+				createHttpError(500, 'An error occurred during tenant update')
+			);
+		}
+	}
 }

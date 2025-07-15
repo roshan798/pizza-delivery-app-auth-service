@@ -58,4 +58,14 @@ router.put(
 	}
 );
 
+router.delete(
+	'/:id',
+	authenticate,
+	canAccess([Roles.ADMIN]),
+	idParamValidator,
+	async (req: Request, res: Response, next: NextFunction) => {
+		await tenantController.deleteTenantById(req, res, next);
+	}
+);
+
 export default router;
