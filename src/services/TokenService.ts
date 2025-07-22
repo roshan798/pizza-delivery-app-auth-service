@@ -17,7 +17,7 @@ export interface Payload {
 export class TokenService {
 	private readonly ACCESS_TOKEN_MAX_AGE = 60 * 60 * 1000; // 1 hour
 	private readonly REFRESH_TOKEN_MAX_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days
-	private readonly DOMAIN = 'localhost';
+	private readonly DOMAIN = Config.DOMAIN;
 	private readonly SAME_SITE: 'strict' | 'lax' | 'none' = 'strict';
 	private readonly ACCESS_TOKEN_EXPIRES_IN = '1h';
 	private readonly REFRESH_TOKEN_EXPIRES_IN = '30 days';
