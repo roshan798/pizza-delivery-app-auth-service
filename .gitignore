@@ -142,3 +142,6 @@ certs/*
 
 public/
 public/.well-known/jwks.json
+
+#replit editor files
+.replit
