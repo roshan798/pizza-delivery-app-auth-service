@@ -141,8 +141,7 @@ export class UserService {
 		try {
 			const users = await this.userRepo.find();
 			logger.info('Users retrieved successfully');
-			return users;
-			 
+			return users.map((user) => ({ ...user, password: undefined }));
 		} catch {
 			throw createHttpError(500, 'Failed to get users');
 		}

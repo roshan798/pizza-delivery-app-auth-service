@@ -45,7 +45,24 @@ describe('GET /users', () => {
 			expect(Array.isArray(users)).toBe(true);
 			expect(users.length).toBeGreaterThanOrEqual(1);
 		});
+
+		it('should not include password field for any user', async () => {
+			const adminUser = await createUser(connection, Roles.ADMIN);
+			await createUser(connection, Roles.CUSTOMER);
+			const accessToken = generateAccessToken(jwks, adminUser);
+
+			const res = await request(app)
+				.get('/users')
+				.set('Cookie', [`accessToken=${accessToken}`]);
+
+			expect(res.status).toBe(200);
+			const users = res.body.users;
+			users.forEach((user: any) => {
+				expect(user).not.toHaveProperty('password');
+			});
+		});
 	});
+
 
 	describe('Sad paths', () => {
 		it('should return 403 for MANAGER or CUSTOMER', async () => {
