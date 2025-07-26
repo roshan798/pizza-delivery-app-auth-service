@@ -1,4 +1,4 @@
-import { NextFunction, Response } from 'express';
+import { NextFunction, Response, Request } from 'express';
 import { UserService } from '../services/UserService';
 import logger from '../config/logger';
 import { validationResult } from 'express-validator';
@@ -43,6 +43,22 @@ export class UserController {
 			});
 		} catch (error) {
 			next(error);
+		}
+	}
+
+	async getUsers(req: Request, res: Response, next: NextFunction) {
+		logger.info('[GET] Request received');
+		try {
+			const users = await this.userService.getAllUsers();
+			logger.info(`[GET] Users retrieved successfully`);
+			return res.status(200).json({
+				success: true,
+				// message: 'Users retrieved successfully',
+				users: users,
+			});
+		} catch (err) {
+			logger.error(err);
+			next(err);
 		}
 	}
 }

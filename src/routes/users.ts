@@ -30,4 +30,17 @@ router.post(
 	}
 );
 
+router.get(
+	'/',
+	authenticate,
+	canAccess([Roles.ADMIN]),
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			await userController.getUsers(req, res, next);
+		} catch (err) {
+			next(err);
+		}
+	}
+);
+
 export default router;

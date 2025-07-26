@@ -135,4 +135,16 @@ export class UserService {
 			throw error;
 		}
 	}
+
+	async getAllUsers() {
+		logger.info('Entering into getAllUsers of UserService');
+		try {
+			const users = await this.userRepo.find();
+			logger.info('Users retrieved successfully');
+			return users;
+			 
+		} catch {
+			throw createHttpError(500, 'Failed to get users');
+		}
+	}
 }
