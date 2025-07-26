@@ -5,6 +5,8 @@ export interface UserData {
 	lastName: string;
 	email: string;
 	password: string;
+	role: ?string; // for now it is optional// TODO make it required
+	tenantId?: number; // for now it is optional// TODO make it required
 }
 export interface RegisterUserRequest extends Request {
 	body: UserData;
@@ -43,3 +45,13 @@ export interface TenantCreateRequest extends Request {
 }
 
 // tenant types
+
+export interface UserCreateRequest extends Request {
+	body: {
+		firstName: string;
+		lastName: string;
+		email: string;
+		password: string;
+		tenantId: number;
+	};
+}

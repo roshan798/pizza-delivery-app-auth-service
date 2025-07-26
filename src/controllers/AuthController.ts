@@ -13,6 +13,7 @@ import { validationResult } from 'express-validator';
 import createHttpError from 'http-errors';
 import jwt from 'jsonwebtoken';
 import { Config } from '../config';
+import { Roles } from '../constants';
 
 export class AuthController {
 	constructor(
@@ -45,6 +46,7 @@ export class AuthController {
 				lastName,
 				email,
 				password,
+				role: Roles.CUSTOMER,
 			});
 
 			const payload: Payload = {
