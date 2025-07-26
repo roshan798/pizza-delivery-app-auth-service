@@ -63,7 +63,6 @@ describe('GET /users', () => {
 		});
 	});
 
-
 	describe('Sad paths', () => {
 		it('should return 403 for MANAGER or CUSTOMER', async () => {
 			const managerUser = await createUser(connection, Roles.MANAGER);
