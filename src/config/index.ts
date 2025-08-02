@@ -14,6 +14,7 @@ const {
 	JWT_SECRET,
 	JWKS_URI,
 	DOMAIN,
+	SSL_REJECT_UNAUTHORIZED,
 } = process.env;
 
 export const Config = {
@@ -30,4 +31,5 @@ export const Config = {
 	JWT_SECRET,
 	JWKS_URI,
 	DOMAIN,
+	SSL_REJECT_UNAUTHORIZED,
 };
