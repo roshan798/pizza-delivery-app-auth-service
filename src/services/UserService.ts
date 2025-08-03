@@ -148,4 +148,9 @@ export class UserService {
 			throw createHttpError(500, 'Failed to get users');
 		}
 	}
+
+	async updateUserByUserId(body: Partial<User>, id: number) {
+		await this.userRepo.update(id, body);
+		return this.userRepo.findOneBy({ id });
+	}
 }

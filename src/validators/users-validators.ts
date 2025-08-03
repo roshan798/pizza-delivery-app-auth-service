@@ -69,8 +69,6 @@ export const updateUserValidator = checkSchema({
 	firstName: { ...baseUserSchema.firstName, optional: true },
 	lastName: { ...baseUserSchema.lastName, optional: true },
 	email: { ...baseUserSchema.email, optional: true },
-	tenantId: { ...baseUserSchema.tenantId, optional: true },
-	// Password excluded intentionally unless needed
 });
 
 // Validator for route parameter `id`

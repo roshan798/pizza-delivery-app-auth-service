@@ -55,3 +55,7 @@ export interface UserCreateRequest extends Request {
 		tenantId: number;
 	};
 }
+
+export interface UserUpdateRequest extends Request {
+	body: Partial<Omit<UserCreateRequest['body'], 'password'>>;
+}

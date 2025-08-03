@@ -3,7 +3,7 @@ import { UserService } from '../services/UserService';
 import logger from '../config/logger';
 import { validationResult } from 'express-validator';
 import { Roles } from '../constants';
-import { UserCreateRequest } from '../types';
+import { UserCreateRequest, UserUpdateRequest } from '../types';
 
 export class UserController {
 	constructor(private userService: UserService) {}
@@ -82,6 +82,70 @@ export class UserController {
 			});
 		} catch (err) {
 			logger.error(err);
+			next(err);
+		}
+	}
+
+	async updateUserById(
+		req: UserUpdateRequest,
+		res: Response,
+		next: NextFunction
+	) {
+		try {
+			const id = req.params.id;
+			logger.info(`[PUT] Request received to update user with id: ${id}`);
+			const validationErrors = validationResult(req);
+			if (!validationErrors.isEmpty()) {
+				logger.warn('[PUT] Param validation failed');
+				return res.status(400).json({
+					success: false,
+					message: 'Invalid input data',
+					errors: validationErrors.array(),
+				});
+			}
+			const { firstName, lastName, email } = req.body;
+			logger.debug(
+				`Update payload: ${JSON.stringify({ firstName, lastName, email })}`
+			);
+			if (!firstName && !lastName && !email) {
+				return res.status(400).json({
+					success: false,
+					message: 'At least one of the fields must be provided!',
+				});
+			}
+
+			const existingUser = await this.userService.findById(Number(id));
+			if (!existingUser) {
+				logger.warn(`User with id ${id} not found`);
+				return res.status(404).json({
+					success: false,
+					message: 'User not found',
+				});
+			}
+
+			const updatedUserData = {
+				...existingUser,
+				firstName: firstName || existingUser.firstName,
+				lastName: lastName || existingUser.lastName,
+				email: email || existingUser.email,
+			};
+			logger.info(`Updating user with id ${id}`);
+			const savedUser = await this.userService.updateUserByUserId(
+				updatedUserData,
+				Number(id)
+			);
+
+			logger.info(`User with id ${id} successfully updated`);
+
+			return res.status(200).json({
+				success: true,
+				user: {
+					...savedUser,
+					password: undefined,
+				},
+			});
+		} catch (err) {
+			logger.error(`Error updating user with id ${req.params.id}:`, err);
 			next(err);
 		}
 	}
