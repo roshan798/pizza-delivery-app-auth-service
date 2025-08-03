@@ -7,7 +7,10 @@ import authenticate from '../middlewares/authenticate';
 import canAccess from '../middlewares/canAccess';
 import { UserController } from '../controllers/UserController';
 import { Roles } from '../constants';
-import { createUserValidator } from '../validators/users-validators';
+import {
+	createUserValidator,
+	idParamValidator,
+} from '../validators/users-validators';
 
 const router = express.Router();
 
@@ -37,6 +40,20 @@ router.get(
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			await userController.getUsers(req, res, next);
+		} catch (err) {
+			next(err);
+		}
+	}
+);
+
+router.get(
+	'/:id',
+	authenticate,
+	canAccess([Roles.ADMIN]),
+	idParamValidator,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			await userController.getUserById(req, res, next);
 		} catch (err) {
 			next(err);
 		}

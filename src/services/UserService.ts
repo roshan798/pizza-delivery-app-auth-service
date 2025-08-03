@@ -70,29 +70,31 @@ export class UserService {
 	}
 	// remove the ERROR from the service functions
 	async findById(id: number) {
-		logger.info('Entering into getUserByEmail of UserService');
+		logger.info(`UserService: Attempting to find user with ID: ${id}`);
 		try {
 			const user = await this.userRepo.findOne({
-				where: {
-					id,
-				},
+				where: { id },
 			});
 
 			if (!user) {
-				throw createHttpError(401, 'Email or Password does not match!');
+				throw createHttpError(404, 'User not found!');
 			}
+
 			return user;
 		} catch (err) {
 			if (err instanceof createHttpError.HttpError) {
-				logger.error(`user not found : ${err.message}`);
+				logger.warn(`UserService: ${err.message}`);
 				throw err;
 			} else if (err instanceof Error) {
-				logger.error(`user not found : ${err.message}`);
+				logger.error(
+					`UserService: Unexpected error occurred - ${err.message}`
+				);
 			} else {
-				logger.error(`user not found : ${JSON.stringify(err)}`);
+				logger.error(
+					`UserService: Unknown error occurred - ${JSON.stringify(err)}`
+				);
 			}
-			const error = createHttpError(500, 'Something bad happend');
-			throw error;
+			throw createHttpError(500, 'Internal server error');
 		}
 	}
 

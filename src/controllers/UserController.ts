@@ -53,8 +53,32 @@ export class UserController {
 			logger.info(`[GET] Users retrieved successfully`);
 			return res.status(200).json({
 				success: true,
-				// message: 'Users retrieved successfully',
 				users: users,
+			});
+		} catch (err) {
+			logger.error(err);
+			next(err);
+		}
+	}
+
+	async getUserById(req: Request, res: Response, next: NextFunction) {
+		try {
+			const id = req.params.id;
+			logger.info(`[GET] Request received with id: ${id}`);
+			const validationErrors = validationResult(req);
+			if (!validationErrors.isEmpty()) {
+				logger.warn('[GET] Param validation failed');
+				return res.status(400).json({
+					success: false,
+					message: 'Invalid input data',
+					errors: validationErrors.array(),
+				});
+			}
+			const user = await this.userService.findById(Number(id));
+			logger.info(`[GET] User retrieved successfully`);
+			return res.status(200).json({
+				success: true,
+				user: { ...user, password: undefined },
 			});
 		} catch (err) {
 			logger.error(err);
