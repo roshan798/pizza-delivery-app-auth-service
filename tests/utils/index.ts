@@ -28,15 +28,21 @@ export function isValidCookieFormat(cookie: string | null): boolean {
 	return true; // If all parts are valid, it's a valid JWT
 }
 
-export const createUser = async (connection: DataSource, role: string) => {
+export const createUser = async (
+	connection: DataSource,
+	role: string,
+	userData?: Partial<User>
+) => {
 	const userRepo = connection.getRepository(User);
-	return await userRepo.save({
-		firstName: 'John',
-		lastName: 'Doe',
-		email: `${role.toLowerCase()}@example.com`,
-		password: 'password123',
-		role,
-	});
+	return await userRepo.save(
+		userData || {
+			firstName: 'John',
+			lastName: 'Doe',
+			email: `${role.toLowerCase()}@example.com`,
+			password: 'password123',
+			role,
+		}
+	);
 };
 
 type Tenant = {
