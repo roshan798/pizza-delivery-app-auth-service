@@ -10,6 +10,7 @@ import { Roles } from '../constants';
 import {
 	createUserValidator,
 	idParamValidator,
+	updateUserValidator,
 } from '../validators/users-validators';
 
 const router = express.Router();
@@ -54,6 +55,21 @@ router.get(
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			await userController.getUserById(req, res, next);
+		} catch (err) {
+			next(err);
+		}
+	}
+);
+
+router.put(
+	'/:id',
+	authenticate,
+	canAccess([Roles.ADMIN]),
+	idParamValidator,
+	updateUserValidator,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			await userController.updateUserById(req, res, next);
 		} catch (err) {
 			next(err);
 		}
