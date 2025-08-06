@@ -153,4 +153,8 @@ export class UserService {
 		await this.userRepo.update(id, body);
 		return this.userRepo.findOneBy({ id });
 	}
+
+	async deleteUserByUserId(id: number) {
+		return await this.userRepo.delete(id);
+	}
 }

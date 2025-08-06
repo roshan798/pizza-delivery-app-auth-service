@@ -149,4 +149,46 @@ export class UserController {
 			next(err);
 		}
 	}
+
+	async deleteUserById(
+		req: UserUpdateRequest,
+		res: Response,
+		next: NextFunction
+	) {
+		try {
+			const id = req.params.id;
+			logger.info(
+				`[DELETE] Request received to delete user with id: ${id}`
+			);
+			const validationErrors = validationResult(req);
+			if (!validationErrors.isEmpty()) {
+				logger.warn('[PUT] Param validation failed');
+				return res.status(400).json({
+					success: false,
+					message: 'Invalid input data',
+					errors: validationErrors.array(),
+				});
+			}
+
+			const existingUser = await this.userService.findById(Number(id));
+			if (!existingUser) {
+				logger.warn(`User with id ${id} not found`);
+				return res.status(404).json({
+					success: false,
+					message: 'User not found',
+				});
+			}
+
+			logger.info(`Deleting user with id ${id}`);
+			await this.userService.deleteUserByUserId(Number(id));
+			logger.info(`User with id ${id} successfully deleted`);
+
+			return res.status(200).json({
+				success: true,
+			});
+		} catch (err) {
+			logger.error(`Error deleting user with id ${req.params.id}:`, err);
+			next(err);
+		}
+	}
 }

@@ -20,9 +20,9 @@ const hashService = new HashService();
 const userService = new UserService(userRepository, hashService);
 const userController = new UserController(userService);
 
+router.use(authenticate);
 router.post(
 	'/',
-	authenticate,
 	canAccess([Roles.ADMIN]),
 	createUserValidator,
 	async (req: Request, res: Response, next: NextFunction) => {
@@ -36,7 +36,6 @@ router.post(
 
 router.get(
 	'/',
-	authenticate,
 	canAccess([Roles.ADMIN]),
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
@@ -49,7 +48,6 @@ router.get(
 
 router.get(
 	'/:id',
-	authenticate,
 	canAccess([Roles.ADMIN]),
 	idParamValidator,
 	async (req: Request, res: Response, next: NextFunction) => {
@@ -63,13 +61,25 @@ router.get(
 
 router.put(
 	'/:id',
-	authenticate,
 	canAccess([Roles.ADMIN]),
 	idParamValidator,
 	updateUserValidator,
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			await userController.updateUserById(req, res, next);
+		} catch (err) {
+			next(err);
+		}
+	}
+);
+
+router.delete(
+	'/:id',
+	canAccess([Roles.ADMIN]),
+	idParamValidator,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			await userController.deleteUserById(req, res, next);
 		} catch (err) {
 			next(err);
 		}
