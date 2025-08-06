@@ -4,7 +4,8 @@
 	"description": "User authentication and management service for the application",
 	"main": "dist/server.js",
 	"scripts": {
-		"test": "jest --watchAll=true --runInBand",
+		"test:watch": "jest --watchAll=true --runInBand",
+		"test": "jest --no-cache --coverage --all --runInBand",
 		"dev": "cross-env NODE_ENV=dev nodemon src/server.ts",
 		"start": "cross-env NODE_ENV=prod ts-node src/server.ts",
 		"build": "tsc",
