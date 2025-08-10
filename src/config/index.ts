@@ -15,6 +15,7 @@ const {
 	JWKS_URI,
 	DOMAIN,
 	SSL_REJECT_UNAUTHORIZED,
+	RSA_PRIVATE_KEY,
 } = process.env;
 
 export const Config = {
@@ -32,4 +33,5 @@ export const Config = {
 	JWKS_URI,
 	DOMAIN,
 	SSL_REJECT_UNAUTHORIZED,
+	RSA_PRIVATE_KEY,
 };

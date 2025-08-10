@@ -1,5 +1,3 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import { JwtPayload, sign } from 'jsonwebtoken';
 import logger from '../config/logger';
 import createHttpError from 'http-errors';
@@ -27,11 +25,15 @@ export class TokenService {
 	generateAccessToken(payload: Payload): string {
 		logger.info('Generating access token');
 
-		let privateKey: Buffer;
+		let privateKey: string;
 		try {
-			privateKey = fs.readFileSync(
-				path.join(__dirname, '../../certs/privateKey.pem')
-			);
+			if (!Config.RSA_PRIVATE_KEY) {
+				throw createHttpError(
+					500,
+					'Internal error during token generation'
+				);
+			}
+			privateKey = Config.RSA_PRIVATE_KEY.replace(/\\n/g, '\n');
 		} catch (error) {
 			logger.error('Could not read signing key for access token');
 			if (Config.NODE_ENV !== 'production') {
