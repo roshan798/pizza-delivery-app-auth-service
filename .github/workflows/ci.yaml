@@ -25,12 +25,14 @@ jobs:
             - name: Test and Coverage
               run: npm run test:coverage
               env:
+                  NODE_ENV: production
                   DB_URI: ${{ secrets.DB_URI }}
                   DB_HOST: ${{ secrets.DB_HOST }}
                   DB_PORT: ${{ secrets.DB_PORT }}
                   DB_USERNAME: ${{ secrets.DB_USERNAME }}
                   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
                   DB_NAME: ${{ secrets.DB_NAME }}
+                  SSL_REJECT_UNAUTHORIZED: "false"
                   JWT_SECRET: ${{ secrets.JWT_SECRET }}
                   JWKS_URI: ${{ secrets.JWKS_URI }}
                   RSA_PRIVATE_KEY: ${{ secrets.RSA_PRIVATE_KEY }}
