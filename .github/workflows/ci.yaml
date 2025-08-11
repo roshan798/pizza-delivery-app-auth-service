@@ -25,7 +25,7 @@ jobs:
             - name: Test and Coverage
               run: npm run test:coverage
               env:
-                  NODE_ENV: production
+                  NODE_ENV: test
                   DB_URI: ${{ secrets.DB_URI }}
                   DB_HOST: ${{ secrets.DB_HOST }}
                   DB_PORT: ${{ secrets.DB_PORT }}

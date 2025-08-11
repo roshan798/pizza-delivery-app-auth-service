@@ -16,6 +16,7 @@ const {
 	DOMAIN,
 	SSL_REJECT_UNAUTHORIZED,
 	RSA_PRIVATE_KEY,
+	DB_URI,
 } = process.env;
 
 export const Config = {
@@ -34,4 +35,5 @@ export const Config = {
 	DOMAIN,
 	SSL_REJECT_UNAUTHORIZED,
 	RSA_PRIVATE_KEY,
+	DB_URI,
 };
