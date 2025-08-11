@@ -32,7 +32,7 @@ jobs:
                   DB_USERNAME: ${{ secrets.DB_USERNAME }}
                   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
                   DB_NAME: ${{ secrets.DB_NAME }}
-                  SSL_REJECT_UNAUTHORIZED: "false"
+                  SSL_REJECT_UNAUTHORIZED: 'false'
                   JWT_SECRET: ${{ secrets.JWT_SECRET }}
                   JWKS_URI: ${{ secrets.JWKS_URI }}
                   RSA_PRIVATE_KEY: ${{ secrets.RSA_PRIVATE_KEY }}
