@@ -29,7 +29,7 @@ export const Config = {
 	DB_USERNAME,
 	DB_PASSWORD,
 	DB_NAME,
-	DB_LOGGING: DB_LOGGING === 'true' || DB_LOGGING === '1' ? true : false,
+	DB_LOGGING: process.env.NODE_ENV !== 'test' && DB_LOGGING === 'true',
 	JWT_SECRET,
 	JWKS_URI,
 	DOMAIN,
