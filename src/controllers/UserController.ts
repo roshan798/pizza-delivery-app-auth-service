@@ -6,7 +6,7 @@ import { Roles } from '../constants';
 import { UserCreateRequest, UserUpdateRequest } from '../types';
 
 export class UserController {
-	constructor(private userService: UserService) {}
+	constructor(private readonly userService: UserService) {}
 
 	async createUser(
 		req: UserCreateRequest,

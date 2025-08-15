@@ -6,7 +6,7 @@ import { TenantCreateRequest } from '../types';
 import { Config } from '../config';
 import createHttpError from 'http-errors';
 export class TenantController {
-	constructor(private tenantService: TenantService) {}
+	constructor(private readonly tenantService: TenantService) {}
 	async createTenant(
 		req: TenantCreateRequest,
 		res: Response,
