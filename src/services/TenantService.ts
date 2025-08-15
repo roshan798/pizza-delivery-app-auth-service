@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import { Tenant } from '../entity/Tenant';
 import logger from '../config/logger';
 export class TenantService {
-	constructor(private tenantRepo: Repository<Tenant>) {}
+	constructor(private readonly tenantRepo: Repository<Tenant>) {}
 	async createTenant(tenantData: Partial<Tenant>): Promise<Tenant> {
 		logger.info(
 			`[SERVICE] Creating tenant with data: ${JSON.stringify(tenantData)}`

@@ -8,8 +8,8 @@ import { HashService } from './HashService';
 
 export class UserService {
 	constructor(
-		private userRepo: Repository<User>,
-		private hashService: HashService
+		private readonly userRepo: Repository<User>,
+		private readonly hashService: HashService
 	) {}
 	async create({ firstName, lastName, email, password, tenantId }: UserData) {
 		try {

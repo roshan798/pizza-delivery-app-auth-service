@@ -20,7 +20,7 @@ export class TokenService {
 	private readonly ACCESS_TOKEN_EXPIRES_IN = '1h';
 	private readonly REFRESH_TOKEN_EXPIRES_IN = '30 days';
 
-	constructor(private refreshTokenRepo: Repository<RefreshToken>) {}
+	constructor(private readonly refreshTokenRepo: Repository<RefreshToken>) {}
 
 	generateAccessToken(payload: Payload): string {
 		logger.info('Generating access token');

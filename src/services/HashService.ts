@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 export class HashService {
-	private HASH_SALT_ROUNDS = 10;
+	private readonly HASH_SALT_ROUNDS = 10;
 	async hashPassword(password: string): Promise<string> {
 		try {
 			const isValidPassword =
