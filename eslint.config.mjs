@@ -15,6 +15,8 @@ export default tseslint.config(
 			'jest.config.js',
 			'**/*.spec.ts',
 			'coverage',
+			'.github',
+			'scripts/**/*.mjs',
 		],
 	},
 	{

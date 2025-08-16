@@ -12,11 +12,7 @@ const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
 		format: 'pem',
 	},
 });
-try {
-	fs.mkdirSync('certs');
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-} catch (e) {
-	// console.error('Cannot create folder ', e);
-}
+fs.mkdirSync('certs');
 fs.writeFileSync('certs/publicKey.pem', publicKey);
 fs.writeFileSync('certs/privateKey.pem', privateKey);
+// put the generated keys in environment variables
