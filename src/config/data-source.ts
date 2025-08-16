@@ -15,7 +15,7 @@ export const AppDataSource = new DataSource({
 	migrations: [__dirname + '/../migrations/**/*.{ts,js}'],
 	subscribers: [],
 	ssl:
-		Config.NODE_ENV === 'dev'
+		Config.NODE_ENV === 'dev' || Config.DB_HOST === 'localhost'
 			? false
 			: {
 					rejectUnauthorized: false,
