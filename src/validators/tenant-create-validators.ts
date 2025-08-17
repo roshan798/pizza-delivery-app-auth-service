@@ -1,6 +1,6 @@
 import { checkSchema, Schema } from 'express-validator';
 
-const notOnlyNumericRegex = /^(?=.*[a-zA-Z])[a-zA-Z0-9\s]+$/;
+const notOnlyNumericRegex = /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,-]+$/;
 
 const baseTenantSchema: Schema = {
 	name: {
