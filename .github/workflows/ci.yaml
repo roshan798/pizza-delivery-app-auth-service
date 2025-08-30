@@ -43,6 +43,7 @@ jobs:
                   JWKS_URI: ${{ secrets.JWKS_URI }}
                   RSA_PRIVATE_KEY: ${{ secrets.RSA_PRIVATE_KEY }}
                   RSA_PUBLIC_KEY: ${{ secrets.RSA_PUBLIC_KEY }}
+                  LOGGING: ${{secrets.LOGGING}}
 
             - name: Build TypeScript
               run: npm run build --if-present
