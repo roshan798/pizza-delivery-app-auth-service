@@ -8,7 +8,7 @@ import canAccess from '../middlewares/canAccess';
 import { UserController } from '../controllers/UserController';
 import { Roles } from '../constants';
 import {
-	createUserValidator,
+	createManagerUserValidator,
 	idParamValidator,
 	updateUserValidator,
 } from '../validators/users-validators';
@@ -28,7 +28,7 @@ router.use(authenticate);
 router.post(
 	'/',
 	canAccess([Roles.ADMIN]),
-	createUserValidator,
+	createManagerUserValidator,
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			await userController.createUser(req, res, next);
