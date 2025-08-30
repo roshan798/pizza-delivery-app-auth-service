@@ -64,11 +64,44 @@ export const createUserValidator = checkSchema({
 	},
 });
 
+// Validator for creating a manager user (same as user but tenantId required)
+export const createManagerUserValidator = checkSchema({
+	...baseUserSchema,
+	password: {
+		notEmpty: { errorMessage: 'Password is required!' },
+		isLength: {
+			options: { min: 6, max: 100 },
+			errorMessage: 'Password must be between 6 and 100 characters.',
+		},
+	},
+	email: {
+		...baseUserSchema.email,
+		custom: {
+			options: async (email: string) => {
+				const userRepository = AppDataSource.getRepository(User);
+				const existingUser = await userRepository.findOne({
+					where: { email },
+				});
+				if (existingUser) {
+					logger.warn(`Manager with email ${email} already exists`);
+					throw new Error('Email already exists');
+				}
+				logger.info(
+					`No existing manager user found with email: ${email}`
+				);
+				return true;
+			},
+		},
+	},
+	tenantId: baseUserSchema.tenantId, // explicitly required
+});
+
 // Validator for updating an existing user (all fields optional)
 export const updateUserValidator = checkSchema({
 	firstName: { ...baseUserSchema.firstName, optional: true },
 	lastName: { ...baseUserSchema.lastName, optional: true },
 	email: { ...baseUserSchema.email, optional: true },
+	tenantId: { ...baseUserSchema.tenantId, optional: true }, // optional when updating
 });
 
 // Validator for route parameter `id`

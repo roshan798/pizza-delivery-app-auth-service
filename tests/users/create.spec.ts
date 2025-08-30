@@ -7,6 +7,25 @@ import { Roles } from '../../src/constants';
 import { User } from '../../src/entity/User';
 import { createUser, generateAccessToken } from '../utils/index';
 
+async function createTenant(connection: DataSource, overrides = {}) {
+	const tenantRepo = connection.getRepository('Tenant');
+	return tenantRepo.save({
+		name: 'test tenant',
+		address: 'test',
+		...overrides,
+	});
+}
+
+function buildNewUser() {
+	return {
+		firstName: 'mangal',
+		lastName: 'panday',
+		email: 'mangal@gmail.com',
+		password: 'password123',
+		tenantId: 1 as number | undefined, // will be overridden with a real tenant in tests
+	};
+}
+
 describe('POST /users', () => {
 	describe('Given all correct fields', () => {
 		let connection: DataSource;
@@ -31,17 +50,13 @@ describe('POST /users', () => {
 			await connection.destroy();
 		});
 
-		const newUser = {
-			firstName: 'mangal',
-			lastName: 'panday',
-			email: 'mangal@gmail.com',
-			password: 'password123',
-			tenantId: 1,
-		};
-
 		it('should return 201 status code', async () => {
 			const savedUser = await createUser(connection, Roles.ADMIN);
 			const accessToken = generateAccessToken(jwks, savedUser);
+
+			const tenant = await createTenant(connection);
+			const newUser = buildNewUser();
+			newUser.tenantId = tenant.id;
 
 			const res = await request(app)
 				.post('/users')
@@ -55,6 +70,10 @@ describe('POST /users', () => {
 			const savedUser = await createUser(connection, Roles.ADMIN);
 			const accessToken = generateAccessToken(jwks, savedUser);
 
+			const tenant = await createTenant(connection);
+			const newUser = buildNewUser();
+			newUser.tenantId = tenant.id;
+
 			const res = await request(app)
 				.post('/users')
 				.set('Cookie', [`accessToken=${accessToken};`])
@@ -67,6 +86,10 @@ describe('POST /users', () => {
 		it('should persist user in DB', async () => {
 			const savedUser = await createUser(connection, Roles.ADMIN);
 			const accessToken = generateAccessToken(jwks, savedUser);
+
+			const tenant = await createTenant(connection);
+			const newUser = buildNewUser();
+			newUser.tenantId = tenant.id;
 
 			const res = await request(app)
 				.post('/users')
@@ -86,14 +109,6 @@ describe('POST /users', () => {
 	});
 
 	describe('Fields are missing', () => {
-		const newUser = {
-			firstName: 'mangal',
-			lastName: 'panday',
-			email: 'mangal@gmail.com',
-			password: 'password123',
-			tenantId: 1,
-		};
-
 		let connection: DataSource;
 		let jwks: JWKSMock;
 
@@ -117,24 +132,35 @@ describe('POST /users', () => {
 		});
 
 		it('should return 403 if user is not admin', async () => {
+			const newUser = buildNewUser();
 			const savedUser = await createUser(connection, Roles.CUSTOMER);
 			const accessToken = generateAccessToken(jwks, savedUser);
+
 			const res = await request(app)
 				.post('/users')
 				.set('Cookie', [`accessToken=${accessToken}`])
 				.send(newUser);
+
 			expect(res.status).toBe(403);
 		});
 
 		it('should only create MANAGER user if user is admin', async () => {
+			const newUser = buildNewUser();
 			const userRepo = AppDataSource.getRepository(User);
+
 			const savedUser = await createUser(AppDataSource, Roles.ADMIN);
 			const accessToken = generateAccessToken(jwks, savedUser);
+
+			const tenant = await createTenant(connection);
+			newUser.tenantId = tenant.id;
+
 			const res = await request(app)
 				.post('/users')
 				.set('Cookie', [`accessToken=${accessToken}`])
 				.send(newUser);
+
 			expect(res.status).toBe(201);
+
 			const created = await userRepo.findOneBy({ id: res.body.id });
 			expect(created!.role).toBe(Roles.MANAGER);
 		});
@@ -157,8 +183,12 @@ describe('POST /users', () => {
 		});
 
 		it('should not create user if email is already taken', async () => {
+			const newUser = buildNewUser();
 			const savedUser = await createUser(connection, Roles.ADMIN);
 			const accessToken = generateAccessToken(jwks, savedUser);
+
+			const tenant = await createTenant(connection);
+			newUser.tenantId = tenant.id;
 
 			// Create initial user
 			await request(app)
@@ -174,22 +204,16 @@ describe('POST /users', () => {
 				.send(newUser);
 
 			expect(res.status).toBe(400);
-			// expect(res.body.message).toMatch(/email.*taken/i);
 		});
 
 		it('should return 401 if access token is missing', async () => {
+			const newUser = buildNewUser();
 			const res = await request(app).post('/users').send(newUser);
-
-			expect(res.status).toBe(401);
-		});
-
-		it('should return 401 if access token is missing', async () => {
-			const res = await request(app).post('/users').send(newUser);
-
 			expect(res.status).toBe(401);
 		});
 
 		it('should return 401 if access token is invalid', async () => {
+			const newUser = buildNewUser();
 			const res = await request(app)
 				.post('/users')
 				.set('Cookie', ['accessToken=invalid.token.here'])
@@ -198,22 +222,41 @@ describe('POST /users', () => {
 			expect(res.status).toBe(401);
 		});
 
-		it.todo('should return 400 if tenantId does not exist');
-		// it('should return 400 if tenantId does not exist', async () => {
-		// 	const savedUser = await createUser(connection, Roles.ADMIN);
-		// 	const accessToken = generateAccessToken(jwks, savedUser);
+		it('should return 400 if tenantId does not exist', async () => {
+			const savedUser = await createUser(connection, Roles.ADMIN);
+			const accessToken = generateAccessToken(jwks, savedUser);
 
-		// 	const res = await request(app)
-		// 		.post('/users')
-		// 		.set('Cookie', [`accessToken=${accessToken}`])
-		// 		.send({
-		// 			...newUser,
-		// 			email: 'newemail@example.com', // to avoid conflict
-		// 			tenantId: 9999, // non-existent
-		// 		});
+			const newUser = buildNewUser();
+			newUser.email = 'newemail@example.com';
+			newUser.tenantId = 9999; // non-existent tenant
 
-		// 	expect(res.status).toBe(400);
-		// 	// expect(res.body.message).toMatch(/tenant.*not exist/i);
-		// });
+			const res = await request(app)
+				.post('/users')
+				.set('Cookie', [`accessToken=${accessToken}`])
+				.send(newUser);
+
+			expect(res.status).toBe(400);
+		});
+		it('should return 400 if admin tries to create manager without tenantId', async () => {
+			const savedUser = await createUser(connection, Roles.ADMIN);
+			const accessToken = generateAccessToken(jwks, savedUser);
+
+			const newUser = buildNewUser();
+			newUser.email = 'managerwithouttenant@example.com'; // unique email
+			delete newUser.tenantId;
+
+			const res = await request(app)
+				.post('/users')
+				.set('Cookie', [`accessToken=${accessToken}`])
+				.send(newUser);
+
+			expect(res.status).toBe(400);
+			// Optionally check the validation message
+			expect(res.body.errors).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({ msg: 'Tenant ID is required!' }),
+				])
+			);
+		});
 	});
 });

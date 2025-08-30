@@ -4,9 +4,13 @@ import logger from '../config/logger';
 import { validationResult } from 'express-validator';
 import { Roles } from '../constants';
 import { UserCreateRequest, UserUpdateRequest } from '../types';
+import { TenantService } from '../services/TenantService';
 
 export class UserController {
-	constructor(private readonly userService: UserService) {}
+	constructor(
+		private readonly userService: UserService,
+		private readonly tenantService: TenantService
+	) {}
 
 	async createUser(
 		req: UserCreateRequest,
@@ -27,6 +31,18 @@ export class UserController {
 
 		try {
 			const { firstName, lastName, email, password, tenantId } = req.body;
+
+			const tenant = await this.tenantService.getTenantById(
+				String(tenantId)
+			);
+			if (!tenant) {
+				logger.warn(`[CREATE] Tenant with id ${tenantId} not found`);
+				return res.status(400).json({
+					success: false,
+					message: 'Invalid tenantId',
+				});
+			}
+
 			const savedUser = await this.userService.createUserByAdmin({
 				firstName,
 				lastName,

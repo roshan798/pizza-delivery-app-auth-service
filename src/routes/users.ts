@@ -12,13 +12,17 @@ import {
 	idParamValidator,
 	updateUserValidator,
 } from '../validators/users-validators';
+import { Tenant } from '../entity/Tenant';
+import { TenantService } from '../services/TenantService';
 
 const router = express.Router();
 
 const userRepository = AppDataSource.getRepository(User);
+const tenantRepo = AppDataSource.getRepository(Tenant);
 const hashService = new HashService();
 const userService = new UserService(userRepository, hashService);
-const userController = new UserController(userService);
+const tenantService = new TenantService(tenantRepo);
+const userController = new UserController(userService, tenantService);
 
 router.use(authenticate);
 router.post(
