@@ -102,6 +102,9 @@ export class AuthController {
 				userId: savedUser.id.toString(),
 				role: savedUser.role,
 			};
+			if (savedUser.role === Roles.MANAGER) {
+				payload.tenantId = String(savedUser.tenantId!);
+			}
 
 			this.tokenService.addAccessToken(res, payload);
 			await this.tokenService.addRefreshToken(res, payload, savedUser);
@@ -122,9 +125,22 @@ export class AuthController {
 		try {
 			const { sub: userId } = req.auth;
 			const user = await this.userService.findById(Number(userId));
-
 			logger.info(`[SELF] Retrieved data for user ID: ${userId}`);
-			res.json({ success: true, user: { ...user, password: undefined } });
+
+			const userResponse = {
+				...user,
+				password: undefined,
+			};
+			if (user.tenantId !== null && user.tenantId !== undefined) {
+				userResponse.tenantId = user.tenantId;
+			} else {
+				userResponse.tenantId = undefined;
+			}
+
+			res.json({
+				success: true,
+				user: userResponse,
+			});
 		} catch (error) {
 			logger.error('[SELF] Failed to fetch user info');
 			if (Config.NODE_ENV !== 'production') logger.debug(error);

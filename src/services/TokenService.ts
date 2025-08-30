@@ -10,6 +10,7 @@ import { Response } from 'express';
 export interface Payload {
 	userId: string;
 	role: string;
+	tenantId?: string;
 }
 
 export class TokenService {
@@ -48,6 +49,7 @@ export class TokenService {
 		const tokenPayload: JwtPayload = {
 			sub: payload.userId,
 			role: payload.role,
+			tenantId: payload.tenantId,
 		};
 
 		const accessToken = sign(tokenPayload, privateKey, {
