@@ -35,7 +35,6 @@ export class UserController {
 			const tenant = await this.tenantService.getTenantById(
 				String(tenantId)
 			);
-			console.log(tenant);
 			if (!tenant) {
 				logger.warn(`[CREATE] Tenant with id ${tenantId} not found`);
 				return res.status(400).json({
