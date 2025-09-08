@@ -17,6 +17,7 @@ const {
 	SSL_REJECT_UNAUTHORIZED,
 	RSA_PRIVATE_KEY,
 	DB_URI,
+	CLIENT_URLS,
 } = process.env;
 
 export const Config = {
@@ -36,4 +37,5 @@ export const Config = {
 	SSL_REJECT_UNAUTHORIZED,
 	RSA_PRIVATE_KEY,
 	DB_URI,
+	CLIENT_URLS: CLIENT_URLS?.split(',') || [''],
 };

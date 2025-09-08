@@ -7,7 +7,16 @@ import authRouter from './routes/auth';
 import tenantRouter from './routes/tenant';
 import userRouter from './routes/users';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import { Config } from './config/index';
 const app = express();
+
+app.use(
+	cors({
+		origin: Config.CLIENT_URLS,
+		credentials: true,
+	})
+);
 
 app.get('/', (req, res) => {
 	res.json({ message: 'Welcome to Auth-Service 👋' });

@@ -15,8 +15,8 @@
 		"lint:fix": "eslint . --fix",
 		"prepare": "husky install",
 		"migration:generate": "cross-env NODE_ENV=dev typeorm-ts-node-commonjs migration:generate -d ./src/config/data-source.ts",
-		"migration:run":"cross-env NODE_ENV=dev typeorm-ts-node-commonjs migration:run -d ./src/config/data-source.ts",
-		"migration:new":"cross-env NODE_ENV=dev typeorm-ts-node-commonjs migration:create -d ./src/config/data-source.ts",
+		"migration:run": "cross-env NODE_ENV=dev typeorm-ts-node-commonjs migration:run -d ./src/config/data-source.ts",
+		"migration:new": "cross-env NODE_ENV=dev typeorm-ts-node-commonjs migration:create -d ./src/config/data-source.ts",
 		"start:DB": "docker run --rm --name mernpg-container -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -v mernpgdata:/var/lib/postgresql/data -p 5432:5432 -d postgres",
 		"stop:DB": "docker stop mernpg-container",
 		"generateKeys": "node ./scripts/generatePrivateKey.mjs"
@@ -27,13 +27,13 @@
 		"node": ">=22.10.0"
 	},
 	"devDependencies": {
+		"@eslint/js": "^9.28.0",
 		"@types/bcrypt": "^5.0.2",
 		"@types/cookie-parser": "^1.4.9",
 		"@types/express": "^5.0.3",
 		"@types/http-errors": "^2.0.5",
-		"@types/jsonwebtoken": "^9.0.10",
-		"@eslint/js": "^9.28.0",
 		"@types/jest": "^29.5.14",
+		"@types/jsonwebtoken": "^9.0.10",
 		"@types/node": "^22.15.29",
 		"@types/supertest": "^6.0.3",
 		"cross-env": "^7.0.3",
@@ -57,8 +57,10 @@
 		]
 	},
 	"dependencies": {
+		"@types/cors": "^2.8.19",
 		"bcrypt": "^6.0.0",
 		"cookie-parser": "^1.4.7",
+		"cors": "^2.8.5",
 		"dotenv": "^16.5.0",
 		"express": "^5.1.0",
 		"express-jwt": "^8.5.1",
