@@ -4,6 +4,8 @@ import {
 	JoinColumn,
 	ManyToOne,
 	PrimaryGeneratedColumn,
+	CreateDateColumn,
+	UpdateDateColumn,
 } from 'typeorm';
 import { Tenant } from './Tenant';
 
@@ -11,14 +13,19 @@ import { Tenant } from './Tenant';
 export class User {
 	@PrimaryGeneratedColumn()
 	id: number;
+
 	@Column()
 	firstName: string;
+
 	@Column()
 	lastName: string;
+
 	@Column({ unique: true })
 	email: string;
+
 	@Column()
 	password: string;
+
 	@Column()
 	role: string;
 
@@ -28,4 +35,10 @@ export class User {
 
 	@Column({ nullable: true })
 	tenantId?: number;
+
+	@CreateDateColumn({ name: 'created_at' })
+	createdAt: Date;
+
+	@UpdateDateColumn({ name: 'updated_at' })
+	updatedAt: Date;
 }

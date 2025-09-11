@@ -119,11 +119,11 @@ export class UserController {
 					errors: validationErrors.array(),
 				});
 			}
-			const { firstName, lastName, email } = req.body;
+			const { firstName, lastName, email, tenantId } = req.body;
 			logger.debug(
-				`Update payload: ${JSON.stringify({ firstName, lastName, email })}`
+				`Update payload: ${JSON.stringify({ firstName, lastName, email, tenantId })}`
 			);
-			if (!firstName && !lastName && !email) {
+			if (!firstName && !lastName && !email && !tenantId) {
 				return res.status(400).json({
 					success: false,
 					message: 'At least one of the fields must be provided!',
@@ -138,12 +138,14 @@ export class UserController {
 					message: 'User not found',
 				});
 			}
+			if()
 
 			const updatedUserData = {
 				...existingUser,
 				firstName: firstName || existingUser.firstName,
 				lastName: lastName || existingUser.lastName,
 				email: email || existingUser.email,
+				tenantId: tenantId || existingUser.tenantId,
 			};
 			logger.info(`Updating user with id ${id}`);
 			const savedUser = await this.userService.updateUserByUserId(
