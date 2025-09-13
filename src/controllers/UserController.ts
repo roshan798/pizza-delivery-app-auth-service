@@ -137,9 +137,15 @@ export class UserController {
 					success: false,
 					message: 'User not found',
 				});
+			} else if (existingUser.role === Roles.ADMIN) {
+				logger.warn(
+					`Update denied: user with id ${id} is an ADMIN and cannot be updated`
+				);
+				return res.status(403).json({
+					success: false,
+					message: 'You are not allowed to update an admin user',
+				});
 			}
-			if()
-
 			const updatedUserData = {
 				...existingUser,
 				firstName: firstName || existingUser.firstName,
@@ -194,6 +200,14 @@ export class UserController {
 				return res.status(404).json({
 					success: false,
 					message: 'User not found',
+				});
+			} else if (existingUser.role === Roles.ADMIN) {
+				logger.warn(
+					`Update denied: user with id ${id} is an ADMIN and cannot be updated`
+				);
+				return res.status(403).json({
+					success: false,
+					message: 'You are not allowed to update an admin user',
 				});
 			}
 
