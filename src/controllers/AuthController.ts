@@ -160,6 +160,10 @@ export class AuthController {
 				role: user.role,
 			};
 
+			if (user.role === Roles.MANAGER) {
+				payload.tenantId = String(user.tenantId!);
+			}
+
 			this.tokenService.addAccessToken(res, payload);
 			await this.tokenService.addRefreshToken(
 				res,

@@ -34,6 +34,10 @@ export interface AuthRequest extends Request {
 		jti?: string;
 	};
 }
+export interface AuthenticatedRequest<T> extends Request {
+	auth: AuthRequest['auth'];
+	body: T;
+}
 
 export type AuthCookie = {
 	accessToken: string;

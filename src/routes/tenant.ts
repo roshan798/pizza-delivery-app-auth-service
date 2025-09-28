@@ -40,7 +40,7 @@ router.get(
 router.get(
 	'/:id',
 	authenticate,
-	canAccess([Roles.ADMIN]),
+	canAccess([Roles.ADMIN, Roles.MANAGER]),
 	idParamValidator,
 	async (req: Request, res: Response, next: NextFunction) => {
 		await tenantController.getTenantById(req, res, next);

@@ -2,9 +2,10 @@ import { Response, NextFunction, Request } from 'express';
 import { TenantService } from '../services/TenantService';
 import logger from '../config/logger';
 import { validationResult } from 'express-validator';
-import { TenantCreateRequest } from '../types';
+import { AuthenticatedRequest, TenantCreateRequest } from '../types';
 import { Config } from '../config';
 import createHttpError from 'http-errors';
+import { Roles } from '../constants';
 export class TenantController {
 	constructor(private readonly tenantService: TenantService) {}
 	async createTenant(
@@ -55,7 +56,8 @@ export class TenantController {
 		}
 	}
 
-	async getTenantById(req: Request, res: Response, next: NextFunction) {
+	async getTenantById(_req: Request, res: Response, next: NextFunction) {
+		const req = _req as AuthenticatedRequest<null>;
 		logger.info('[GET] Request received');
 
 		const validationErrors = validationResult(req);
@@ -68,6 +70,13 @@ export class TenantController {
 			});
 		}
 		try {
+			const { role, tenantId } = req.auth;
+			if (role === Roles.MANAGER && req.params.id !== tenantId) {
+				return res.status(403).json({
+					success: false,
+					message: 'Forbidden: Access is denied',
+				});
+			}
 			const id: string = req.params.id;
 			logger.info(`[GET] By Tenant ID  Request received : ${id}`);
 			const tenant = await this.tenantService.getTenantById(id);
