@@ -47,6 +47,7 @@ export class TenantController {
 		logger.info('[GET] Request received');
 		try {
 			const tenants = await this.tenantService.getTenants();
+			logger.info(`[GET] Retrieved ${tenants.length} tenants`);
 			res.json({
 				success: true,
 				tenants: tenants,

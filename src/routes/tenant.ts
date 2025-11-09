@@ -30,8 +30,8 @@ router.post(
 
 router.get(
 	'/',
-	authenticate,
-	canAccess([Roles.ADMIN]),
+	// authenticate,
+	// canAccess([Roles.ADMIN]),
 	async (req: Request, res: Response, next: NextFunction) => {
 		await tenantController.getTenants(req, res, next);
 	}
