@@ -27,6 +27,7 @@ const baseUserSchema: Schema = {
 		normalizeEmail: true,
 	},
 	tenantId: {
+		in: ['body'],
 		notEmpty: { errorMessage: 'Tenant ID is required!' },
 		isInt: {
 			options: { min: 1 },
