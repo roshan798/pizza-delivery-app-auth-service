@@ -34,7 +34,8 @@ export class TokenService {
 					'Internal error during token generation'
 				);
 			}
-			privateKey = Config.RSA_PRIVATE_KEY.replace(/\\n/g, '\n');
+
+			privateKey = Config.RSA_PRIVATE_KEY.replace(/\\n/g, '\n'); // NOSONAR
 		} catch (error) {
 			logger.error('Could not read signing key for access token');
 			if (Config.NODE_ENV !== 'production') {
