@@ -400,6 +400,7 @@ describe('POST auth/register', () => {
 			expect([201, 400]).toContain(response.status);
 		});
 		it.skip('should not allow registration for revoked/deleted user email', async () => {
+			// Skipped due to implementation specifics
 			const userRepo = AppDataSource.getRepository('User');
 			await userRepo.save({
 				firstName: 'Jane',
