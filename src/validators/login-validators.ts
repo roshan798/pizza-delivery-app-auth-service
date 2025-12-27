@@ -8,6 +8,7 @@ export default checkSchema({
 
 		trim: true,
 		isEmail: {
+			if: (value: string) => value.length > 0,
 			errorMessage: 'Invalid email format!',
 		},
 	},
