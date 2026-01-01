@@ -52,6 +52,12 @@ export class AuthController {
 			const payload: Payload = {
 				userId: savedUser.id.toString(),
 				role: savedUser.role,
+				tenantId: savedUser.tenantId
+					? savedUser.tenantId.toString()
+					: undefined,
+				firstName: savedUser.firstName,
+				lastName: savedUser.lastName,
+				email: savedUser.email,
 			};
 
 			this.tokenService.addAccessToken(res, payload);
@@ -101,6 +107,9 @@ export class AuthController {
 			const payload: Payload = {
 				userId: savedUser.id.toString(),
 				role: savedUser.role,
+				firstName: savedUser.firstName,
+				lastName: savedUser.lastName,
+				email: savedUser.email,
 			};
 			if (savedUser.role === Roles.MANAGER) {
 				payload.tenantId = String(savedUser.tenantId!);
@@ -158,6 +167,9 @@ export class AuthController {
 			const payload: Payload = {
 				userId: user.id.toString(),
 				role: user.role,
+				firstName: user.firstName,
+				lastName: user.lastName,
+				email: user.email,
 			};
 
 			if (user.role === Roles.MANAGER) {
