@@ -54,6 +54,9 @@ export class TokenService {
 			sub: payload.userId,
 			role: payload.role,
 			tenantId: payload.tenantId,
+			firstName: payload.firstName,
+			lastName: payload.lastName,
+			email: payload.email,
 		};
 
 		const accessToken = sign(tokenPayload, privateKey, {
