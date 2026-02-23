@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 #setting build argument for node version, default is 18.16.0
-ARG NODE_VERSION=18.16.0
+ARG NODE_VERSION=22.22.0
 
 # Use the official Node.js image as the base image
 FROM node:${NODE_VERSION}-alpine AS builder
