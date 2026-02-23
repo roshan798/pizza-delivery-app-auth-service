@@ -1,31 +1,53 @@
-# ---------- Build Stage ----------
-FROM node:22-alpine AS builder
+# syntax=docker/dockerfile:1
 
-WORKDIR /app
+#setting build argument for node version, default is 18.16.0
+ARG NODE_VERSION=18.16.0
 
-COPY package*.json ./
+# Use the official Node.js image as the base image
+FROM node:${NODE_VERSION}-alpine AS builder
 
-RUN npm ci
+# Set the working directory in the container
+WORKDIR /home/node/app
 
+# Copy package.json and package-lock.json to the working directory
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=package-lock.json,target=package-lock.json \
+    --mount=type=cache,target=/root/.npm \
+    npm ci
+
+# Copy the rest of the application code to the working directory
 COPY . .
 
 RUN npm run build
 
-# ---------- Production Stage ----------
-FROM node:22-alpine AS production
+# Use a smaller base image for the final image
+FROM node:${NODE_VERSION}-alpine
 
+# Set user from root to node for security reasons
+USER node
+
+# Create the application directory and set it as the working directory
+RUN mkdir -p /home/node/app
+
+# set the working directory to the application directory
+WORKDIR /home/node/app
+
+#set environment variable for production
 ENV NODE_ENV=production
 
-WORKDIR /app
+# Copy package.json and package-lock.json to the working directory
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=package-lock.json,target=package-lock.json \
+    --mount=type=cache,target=/root/.npm \
+    npm ci --omit=dev --ignore-scripts
 
-COPY package*.json ./
+# Copy the built application from the builder stage to the final image
+# --chown=node:node is used to set the ownership of the copied files to the node user
+COPY --from=builder --chown=node:node /home/node/app/dist ./
 
-# Install only production dependencies
-RUN npm ci --ignore-scripts --omit=dev  --prefer-offline 
+EXPOSE 8081
+# Start the application
+CMD ["node", "src/server.js"]
 
-# Copy built app from builder stage
-COPY --from=builder /app/dist ./dist
 
-EXPOSE 8080
 
-CMD ["node", "dist/src/server.js"]
