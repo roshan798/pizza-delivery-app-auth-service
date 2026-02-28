@@ -147,3 +147,5 @@ public/.well-known/jwks.json
 #replit editor files
 .replit
 .env.production
+*.pem
+

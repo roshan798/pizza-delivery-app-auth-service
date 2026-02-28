@@ -4,10 +4,14 @@ import { Config } from '.';
 
 export const AppDataSource = new DataSource({
 	type: 'postgres',
+	// url: Config.DB_URI,
 	host: Config.DB_HOST,
 	port: Number(Config.DB_PORT),
 	username: Config.DB_USERNAME,
 	password: Config.DB_PASSWORD,
+	extra: {
+		family: 4, // Force IPv4
+	},
 	database: Config.DB_NAME,
 	synchronize: Config.NODE_ENV !== 'prod',
 	logging: Config.DB_LOGGING,
