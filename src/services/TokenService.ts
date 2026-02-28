@@ -34,7 +34,7 @@ export class TokenService {
 		let privateKey: Buffer;
 		try {
 			privateKey = fs.readFileSync(
-				path.join(__dirname, '../../certs/privateKey.pem')
+				path.join(__dirname, '../../certs/private.pem')
 			);
 		} catch (error) {
 			logger.error('Could not read signing key for access token');
