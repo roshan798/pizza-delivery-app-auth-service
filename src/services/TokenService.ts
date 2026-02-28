@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { JwtPayload, sign } from 'jsonwebtoken';
 import logger from '../config/logger';
 import createHttpError from 'http-errors';
@@ -17,11 +19,11 @@ export interface Payload {
 }
 
 export class TokenService {
-	private readonly ACCESS_TOKEN_MAX_AGE = 60 * 1000 * 60; // 1 minute
+	private readonly ACCESS_TOKEN_MAX_AGE = 60 * 1000; // 1 minute
 	private readonly REFRESH_TOKEN_MAX_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days
 	private readonly DOMAIN = Config.DOMAIN;
 	private readonly SAME_SITE: 'strict' | 'lax' | 'none' = 'strict';
-	private readonly ACCESS_TOKEN_EXPIRES_IN = '60min';
+	private readonly ACCESS_TOKEN_EXPIRES_IN = '1min';
 	private readonly REFRESH_TOKEN_EXPIRES_IN = '30 days';
 
 	constructor(private readonly refreshTokenRepo: Repository<RefreshToken>) {}
@@ -29,16 +31,11 @@ export class TokenService {
 	generateAccessToken(payload: Payload): string {
 		logger.info('Generating access token');
 
-		let privateKey: string;
+		let privateKey: Buffer;
 		try {
-			if (!Config.RSA_PRIVATE_KEY) {
-				throw createHttpError(
-					500,
-					'Internal error during token generation'
-				);
-			}
-
-			privateKey = Config.RSA_PRIVATE_KEY.replace(/\\n/g, '\n'); // NOSONAR
+			privateKey = fs.readFileSync(
+				path.join(__dirname, '../../certs/privateKey.pem')
+			);
 		} catch (error) {
 			logger.error('Could not read signing key for access token');
 			if (Config.NODE_ENV !== 'production') {

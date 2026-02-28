@@ -15,7 +15,6 @@ const {
 	JWKS_URI,
 	DOMAIN,
 	SSL_REJECT_UNAUTHORIZED,
-	RSA_PRIVATE_KEY,
 	DB_URI,
 	CLIENT_URLS,
 } = process.env;
@@ -35,7 +34,6 @@ export const Config = {
 	JWKS_URI,
 	DOMAIN,
 	SSL_REJECT_UNAUTHORIZED,
-	RSA_PRIVATE_KEY,
 	DB_URI,
 	CLIENT_URLS: CLIENT_URLS?.split(',') || [''],
 	LOGGING: process.env.NODE_ENV !== 'test' && process.env.LOGGING === 'true',
