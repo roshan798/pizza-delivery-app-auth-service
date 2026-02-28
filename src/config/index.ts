@@ -38,4 +38,5 @@ export const Config = {
 	RSA_PRIVATE_KEY,
 	DB_URI,
 	CLIENT_URLS: CLIENT_URLS?.split(',') || [''],
+	LOGGING: process.env.NODE_ENV !== 'test' && process.env.LOGGING === 'true',
 };
