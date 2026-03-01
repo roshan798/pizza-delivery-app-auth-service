@@ -19,7 +19,7 @@ app.use(
 );
 
 app.get('/', (req, res) => {
-	res.json({ message: 'Welcome to Auth-Service 👋' });
+	res.json({ message: 'Welcome to Auth-Service From k8s 👋' });
 });
 app.use(express.json());
 app.use(
