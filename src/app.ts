@@ -19,7 +19,10 @@ app.use(
 );
 
 app.get('/', (req, res) => {
-	res.json({ message: 'Welcome to Auth-Service From k8s 👋' });
+	res.json({
+		message: 'Welcome to Auth-Service From k8s 👋',
+		msg: 'This is the authentication service for the pizza delivery app. It handles user authentication, authorization, and tenant management.',
+	});
 });
 app.use(express.json());
 app.use(
